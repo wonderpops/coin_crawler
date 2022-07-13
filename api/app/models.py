@@ -36,7 +36,7 @@ class User(ormar.Model):
 
 class Coin_pair(ormar.Model):
     class Meta:
-        tablename = "Coin_pairs"
+        tablename = "coin_pairs"
         database = database
         metadata = metadata
 
@@ -54,7 +54,7 @@ class Coin_pair_data(ormar.Model):
         metadata = metadata
 
     id: int = ormar.Integer(primary_key=True)
-    coin_pair: Coin_pair = ormar.ForeignKey(Coin_pair)
+    coin_pair: Coin_pair = ormar.ForeignKey(Coin_pair, related_name="coin_pair_data")
     open: float = ormar.Float()
     close: float = ormar.Float()
     high: float = ormar.Float()
