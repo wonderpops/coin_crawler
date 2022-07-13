@@ -117,8 +117,7 @@ def user(Authorize: AuthJWT = Depends()):
     return current_user
 
 
-requested_coin_pair = Coin_pair.get_pydantic(exclude={'id','coin_pair_datas'})
-
+requested_coin_pair = Coin_pair.get_pydantic(exclude={'id','coin_pair_data'})
 @app.post('/add_coin_pair', response_model=Coin_pair)
 async def add_coin_pair(coin_pair: requested_coin_pair):
     coin_pair = Coin_pair(**coin_pair.dict())
@@ -132,10 +131,27 @@ async def get_all_coin_pairs():
     return coin_pairs
 
 
-requested_coin_pair_data = Coin_pair_data.get_pydantic(exclude={'id': ..., 'coin_pair': {'name','short_name','status', 'enabled'}})
+@app.delete('/delete_coin_pair')
+async def delete_coin_pair(coin_pair_id: int):
+    coin_pair = await Coin_pair.objects.get_or_none(id=coin_pair_id) 
+    if coin_pair:
+        await coin_pair.coin_pair_data.clear(keep_reversed=False)
+        await coin_pair.delete()
+        return JSONResponse(status_code=200, content={'message': f'Coin pair with id \'{coin_pair_id}\' was deleted'})
+    else:
+        return JSONResponse(status_code=200, content={'message': f'Coin pair with id \'{coin_pair_id}\' not found'})
 
+
+requested_coin_pair_data = Coin_pair_data.get_pydantic(exclude={'id': ..., 'coin_pair': {'name','short_name','status', 'enabled'}})
 @app.post('/add_coin_pair_data', response_model=Coin_pair_data)
 async def add_coin_pair_data(coin_pair_data: requested_coin_pair_data): # type: ignore
     coin_pair_data = Coin_pair_data(**coin_pair_data.dict())
     coin_pair_data = await coin_pair_data.save()
     return coin_pair_data
+
+
+response_coin_pair_data = Coin_pair_data.get_pydantic(exclude={'coin_pair': {'coin_pair_data'}})
+@app.get('/get_all_coin_pairs_data', response_model=List[response_coin_pair_data])
+async def get_all_coin_pairs_data():
+    coin_pairs_data = await Coin_pair_data.objects.select_all(follow=True).all()   
+    return coin_pairs_data
