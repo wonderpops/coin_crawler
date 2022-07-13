@@ -124,3 +124,9 @@ async def add_coin_pair(coin_pair: requested_coin_pair):
     coin_pair = Coin_pair(**coin_pair.dict())
     coin_pair_data = await coin_pair.save()
     return coin_pair_data
+
+
+@app.get('/get_all_coin_pairs', response_model=List[Coin_pair])
+async def get_all_coin_pairs():
+    coin_pairs = await Coin_pair.objects.select_all(follow=True).all()   
+    return coin_pairs
