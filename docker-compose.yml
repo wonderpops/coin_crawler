@@ -25,6 +25,15 @@ services:
       - ./api/alembic:/api/alembic
     links:
       - 'db'
+  bot:
+    build: ./bot
+    ports:
+      - '5003'
+    environment:
+      - BAPI_KEY=${BAPI_KEY} 
+      - BAPI_SECRET=${BAPI_SECRET}
+    links:
+      - 'api'
 volumes:
   db:
     driver: local

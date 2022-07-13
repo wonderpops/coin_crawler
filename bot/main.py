@@ -1,8 +1,9 @@
 from binance.spot import Spot
 import time
+import os
 
-api_key = 'r4k9lLkv0wTIYL5R8e7vCH53G4BqWhgJVg0VVMcCDKlqKVKsl0tAy82slKlNdFEt'
-api_secret = '2Sa45sHIV07RT49dOgJPfCihl623ArdOiHt77pUf4yUw2HRPleTMyWPOw8Oxv364'
+api_key = os.environ['BAPI_KEY']
+api_secret = os.environ['BAPI_SECRET']
 
 client = Spot(key=api_key, secret=api_secret)
 
@@ -37,12 +38,16 @@ def calc_coin_data(coin):
     print(coin['ks'])
     print(coin['ds'])
 
-for _ in range(10):
-    for coin in coins:
-        print(f'------calc coin {coin["name"]}------')
-        calc_coin_data(coin)
-        print(f'------------------------------------')
-    time.sleep(60)
+
+if __name__ == "__main__":
+    time.sleep(5)
+    print('Bot launched')
+    for _ in range(2):
+        for coin in coins:
+            print(f'------calc coin {coin["name"]}------')
+            calc_coin_data(coin)
+            print(f'------------------------------------')
+        time.sleep(60)
 
 
 
