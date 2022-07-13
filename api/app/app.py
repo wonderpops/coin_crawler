@@ -130,3 +130,12 @@ async def add_coin_pair(coin_pair: requested_coin_pair):
 async def get_all_coin_pairs():
     coin_pairs = await Coin_pair.objects.select_all(follow=True).all()   
     return coin_pairs
+
+
+requested_coin_pair_data = Coin_pair_data.get_pydantic(exclude={'id': ..., 'coin_pair': {'name','short_name','status', 'enabled'}})
+
+@app.post('/add_coin_pair_data', response_model=Coin_pair_data)
+async def add_coin_pair_data(coin_pair_data: requested_coin_pair_data): # type: ignore
+    coin_pair_data = Coin_pair_data(**coin_pair_data.dict())
+    coin_pair_data = await coin_pair_data.save()
+    return coin_pair_data
