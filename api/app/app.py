@@ -115,3 +115,12 @@ def user(Authorize: AuthJWT = Depends()):
 
     current_user = Authorize.get_jwt_subject()
     return current_user
+
+
+requested_coin_pair = Coin_pair.get_pydantic(exclude={'id','coin_pair_datas'})
+
+@app.post('/add_coin_pair', response_model=Coin_pair)
+async def add_coin_pair(coin_pair: requested_coin_pair):
+    coin_pair = Coin_pair(**coin_pair.dict())
+    coin_pair_data = await coin_pair.save()
+    return coin_pair_data
