@@ -3,6 +3,7 @@ import time
 import os
 import requests
 import json
+from datetime import datetime
 
 api_key = os.environ['BAPI_KEY']
 api_secret = os.environ['BAPI_SECRET']
@@ -25,6 +26,19 @@ def login_cc_api(username, password):
         return keys
     else:
         raise Exception('Connection to coin crawler api error')
+
+
+def get_fresh_keys(keys):
+    r_u = coin_crawler_api_url + 'refresh'
+    if keys['expires_at'] < datetime.timestamp(datetime.utcnow())+2:
+        r = requests.post(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["access_token"]}'})
+        if r.status_code == 200:
+            keys = json.loads(r.content)
+            return keys
+        else:
+            raise Exception('Connection to coin crawler api error')
+    else:
+        return keys
 
 
 def get_candle(coin, period):
@@ -60,7 +74,8 @@ if __name__ == "__main__":
     time.sleep(2)
     print('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
-    print(cc_api_keys)
+    time.sleep(2)
+    print(get_fresh_keys(cc_api_keys))
     # for _ in range(2):
     #     for coin in coins:
     #         print(f'------calc coin {coin["name"]}------')
