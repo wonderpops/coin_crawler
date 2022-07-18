@@ -81,6 +81,19 @@ def get_coin_pairs(keys, local_cp):
     return sync_local_and_api_coin_pairs(local_cp, api_cp)
 
 
+def upload_coin_pair_candle_to_cc_api(keys, coin, candle):
+    r_u = coin_crawler_api_url + 'add_coin_pair_data'
+    keys = get_fresh_keys(keys)
+    logging.info(f'Uploading {coin["short_name"]} candle to coin crawler api...')
+    r = requests.post(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["access_token"]}'}, data=json.dumps(candle))
+    if r.status_code == 200:
+        logging.info(f'Uploading {coin["short_name"]} candle successfull')
+        coin_pairs = json.loads(r.content)
+        return coin_pairs
+    else:
+        raise Exception('Connection to coin crawler api error')
+
+
 def get_candle(coin, period):
     c = client.klines(coin, period, limit=1)[0]
     candle = {'open_time': c[0], 'close_time': c[6], 'open': float(c[1]), 'close': float(c[4]), 'high': float(c[2]), 'low': float(c[3])}
@@ -101,13 +114,11 @@ def calc_d(ks, ds):
     return ds
 
 def calc_coin_data(coin):
-    candle = get_candle(coin['name'], coin['period'])
+    candle = get_candle(coin['short_name'], coin['period'])
     coin['ks'] = calc_ks(coin['ks'], candle)
     coin['ds'] = calc_d(coin['ks'], coin['ds'])
-    candle.update({'k': coin['ks'][len(coin['ks'])-1], 'd': coin['ds'][len(coin['ds'])-1]})
-    print(candle)
-    print(coin['ks'])
-    print(coin['ds'])
+    candle.update({"coin_pair": {"id": coin['id']},'k': coin['ks'][len(coin['ks'])-1], 'd': coin['ds'][len(coin['ds'])-1]})
+    return candle
 
 
 if __name__ == "__main__":
@@ -115,7 +126,10 @@ if __name__ == "__main__":
     logging.info('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
     time.sleep(2)
-    print(get_coin_pairs(cc_api_keys, coins))
+    coins = get_coin_pairs(cc_api_keys, coins)
+    for coin in coins:
+        candle = calc_coin_data(coin)
+        upload_coin_pair_candle_to_cc_api(cc_api_keys, coin, candle)
     # for _ in range(2):
     #     for coin in coins:
     #         print(f'------calc coin {coin["name"]}------')
