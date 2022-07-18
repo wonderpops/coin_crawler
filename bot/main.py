@@ -4,6 +4,9 @@ import os
 import requests
 import json
 from datetime import datetime
+import logging
+
+logging.basicConfig(format='%(asctime)s | %(message)s', level=logging.INFO)
 
 api_key = os.environ['BAPI_KEY']
 api_secret = os.environ['BAPI_SECRET']
@@ -20,8 +23,10 @@ coins = [{'name': 'MATICBUSD', 'period': '5m', 'ks': [], 'ds': []}]
 
 def login_cc_api(username, password):
     r_u = coin_crawler_api_url + f'login?username={username}&password={password}'
+    logging.info('Loggining in coin crawler api...')
     r = requests.post(r_u)
     if r.status_code == 200:
+        logging.info('Login to coin crawler api successfull')
         keys = json.loads(r.content)
         return keys
     else:
@@ -31,8 +36,10 @@ def login_cc_api(username, password):
 def get_fresh_keys(keys):
     r_u = coin_crawler_api_url + 'refresh'
     if keys['expires_at'] < datetime.timestamp(datetime.utcnow())+2:
+        logging.info('Trying to update keys...')
         r = requests.post(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["access_token"]}'})
         if r.status_code == 200:
+            logging.info('Updating keys successfull')
             keys = json.loads(r.content)
             return keys
         else:
@@ -72,7 +79,7 @@ def calc_coin_data(coin):
 
 if __name__ == "__main__":
     time.sleep(2)
-    print('Bot launched')
+    logging.info('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
     time.sleep(2)
     print(get_fresh_keys(cc_api_keys))
