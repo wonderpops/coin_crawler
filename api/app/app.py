@@ -1,3 +1,4 @@
+from datetime import tzinfo
 from email.mime import image
 from fastapi import FastAPI, HTTPException, Depends, Request, File, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
@@ -124,8 +125,8 @@ async def add_coin_pair(coin_pair: requested_coin_pair):
     coin_pair_data = await coin_pair.save()
     return coin_pair_data
 
-
-@app.get('/get_all_coin_pairs', response_model=List[Coin_pair])
+response_coin_pair = Coin_pair.get_pydantic(exclude={'coin_pair_data': {'coin_pair'}})
+@app.get('/get_all_coin_pairs', response_model=List[response_coin_pair])
 async def get_all_coin_pairs():
     coin_pairs = await Coin_pair.objects.select_all(follow=True).all()   
     return coin_pairs
@@ -146,6 +147,8 @@ requested_coin_pair_data = Coin_pair_data.get_pydantic(exclude={'id': ..., 'coin
 @app.post('/add_coin_pair_data', response_model=Coin_pair_data)
 async def add_coin_pair_data(coin_pair_data: requested_coin_pair_data): # type: ignore
     coin_pair_data = Coin_pair_data(**coin_pair_data.dict())
+    coin_pair_data.open_time = coin_pair_data.open_time.replace(tzinfo=None)
+    coin_pair_data.close_time = coin_pair_data.close_time.replace(tzinfo=None)
     coin_pair_data = await coin_pair_data.save()
     return coin_pair_data
 
