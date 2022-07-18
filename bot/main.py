@@ -18,7 +18,7 @@ cc_api_keys = {}
 
 client = Spot(key=api_key, secret=api_secret)
 
-coins = [{'name': 'MATICBUSD', 'period': '5m', 'ks': [], 'ds': []}]
+coins = []
 
 
 def login_cc_api(username, password):
@@ -61,6 +61,26 @@ def get_coin_pairs_from_cc_api(keys):
         raise Exception('Connection to coin crawler api error')
 
 
+def sync_local_and_api_coin_pairs(local_coin_pairs, api_coin_pairs):
+    result = []
+    for a_cp in api_coin_pairs:
+        is_cp_updated = False
+        for l_cp in local_coin_pairs:
+            if a_cp['short_name'] == l_cp['short_name']:
+                l_cp.update(a_cp)
+                result.append(l_cp)
+                is_cp_updated = True
+        if not is_cp_updated:
+            a_cp.update({'period': '5m', 'ks': [], 'ds': []})
+            result.append(a_cp)
+    return result
+
+
+def get_coin_pairs(keys, local_cp):
+    api_cp = get_coin_pairs_from_cc_api(keys)
+    return sync_local_and_api_coin_pairs(local_cp, api_cp)
+
+
 def get_candle(coin, period):
     c = client.klines(coin, period, limit=1)[0]
     candle = {'open_time': c[0], 'close_time': c[6], 'open': float(c[1]), 'close': float(c[4]), 'high': float(c[2]), 'low': float(c[3])}
@@ -95,7 +115,7 @@ if __name__ == "__main__":
     logging.info('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
     time.sleep(2)
-    print(get_coin_pairs_from_cc_api(cc_api_keys)[0])
+    print(get_coin_pairs(cc_api_keys, coins))
     # for _ in range(2):
     #     for coin in coins:
     #         print(f'------calc coin {coin["name"]}------')
