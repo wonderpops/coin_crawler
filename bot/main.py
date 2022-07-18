@@ -37,7 +37,7 @@ def get_fresh_keys(keys):
     r_u = coin_crawler_api_url + 'refresh'
     if keys['expires_at'] < datetime.timestamp(datetime.utcnow())+2:
         logging.info('Trying to update keys...')
-        r = requests.post(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["access_token"]}'})
+        r = requests.post(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["refresh_token"]}'})
         if r.status_code == 200:
             logging.info('Updating keys successfull')
             keys = json.loads(r.content)
