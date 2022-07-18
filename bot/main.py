@@ -125,11 +125,18 @@ if __name__ == "__main__":
     time.sleep(2)
     logging.info('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
-    time.sleep(2)
     coins = get_coin_pairs(cc_api_keys, coins)
-    for coin in coins:
-        candle = calc_coin_data(coin)
-        upload_coin_pair_candle_to_cc_api(cc_api_keys, coin, candle)
+    try:
+        while True :
+            for coin in coins:
+                candle = calc_coin_data(coin)
+                upload_coin_pair_candle_to_cc_api(cc_api_keys, coin, candle)
+            coins = get_coin_pairs(cc_api_keys, coins)
+            time.sleep(60)
+    except KeyboardInterrupt:
+        logging.info('Interrupted with keyboard')
+    except Exception as e:
+        logging.critical(f'Interrupted with error: "{e}"')
     # for _ in range(2):
     #     for coin in coins:
     #         print(f'------calc coin {coin["name"]}------')
