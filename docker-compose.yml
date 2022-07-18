@@ -32,6 +32,8 @@ services:
     environment:
       - BAPI_KEY=${BAPI_KEY} 
       - BAPI_SECRET=${BAPI_SECRET}
+      - BOT_USER=${BOT_USER}
+      - BOT_PASSWORD=${BOT_PASSWORD}
     links:
       - 'api'
 volumes:

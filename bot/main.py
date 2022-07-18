@@ -1,13 +1,30 @@
 from binance.spot import Spot
 import time
 import os
+import requests
+import json
 
 api_key = os.environ['BAPI_KEY']
 api_secret = os.environ['BAPI_SECRET']
 
+bot_user = os.environ['BOT_USER']
+bot_password = os.environ['BOT_PASSWORD']
+coin_crawler_api_url = 'http://api/'
+cc_api_keys = {}
+
 client = Spot(key=api_key, secret=api_secret)
 
 coins = [{'name': 'MATICBUSD', 'period': '5m', 'ks': [], 'ds': []}]
+
+
+def login_cc_api(username, password):
+    r_u = coin_crawler_api_url + f'login?username={username}&password={password}'
+    r = requests.post(r_u)
+    if r.status_code == 200:
+        keys = json.loads(r.content)
+        return keys
+    else:
+        raise Exception('Connection to coin crawler api error')
 
 
 def get_candle(coin, period):
@@ -40,14 +57,16 @@ def calc_coin_data(coin):
 
 
 if __name__ == "__main__":
-    time.sleep(5)
+    time.sleep(2)
     print('Bot launched')
-    for _ in range(2):
-        for coin in coins:
-            print(f'------calc coin {coin["name"]}------')
-            calc_coin_data(coin)
-            print(f'------------------------------------')
-        time.sleep(60)
+    cc_api_keys = login_cc_api(bot_user, bot_password)
+    print(cc_api_keys)
+    # for _ in range(2):
+    #     for coin in coins:
+    #         print(f'------calc coin {coin["name"]}------')
+    #         calc_coin_data(coin)
+    #         print(f'------------------------------------')
+    #     time.sleep(60)
 
 
 
