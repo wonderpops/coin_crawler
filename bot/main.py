@@ -48,6 +48,19 @@ def get_fresh_keys(keys):
         return keys
 
 
+def get_coin_pairs_from_cc_api(keys):
+    r_u = coin_crawler_api_url + 'get_all_coin_pairs'
+    keys = get_fresh_keys(keys)
+    logging.info('Getting coin pairs from coin crawler api...')
+    r = requests.get(r_u, headers={'Accept': 'application/json', 'Authorization': f'Bearer {keys["access_token"]}'})
+    if r.status_code == 200:
+        logging.info('Getting coin pairs successfull')
+        coin_pairs = json.loads(r.content)
+        return coin_pairs
+    else:
+        raise Exception('Connection to coin crawler api error')
+
+
 def get_candle(coin, period):
     c = client.klines(coin, period, limit=1)[0]
     candle = {'open_time': c[0], 'close_time': c[6], 'open': float(c[1]), 'close': float(c[4]), 'high': float(c[2]), 'low': float(c[3])}
@@ -82,7 +95,7 @@ if __name__ == "__main__":
     logging.info('Bot launched')
     cc_api_keys = login_cc_api(bot_user, bot_password)
     time.sleep(2)
-    print(get_fresh_keys(cc_api_keys))
+    print(get_coin_pairs_from_cc_api(cc_api_keys)[0])
     # for _ in range(2):
     #     for coin in coins:
     #         print(f'------calc coin {coin["name"]}------')
