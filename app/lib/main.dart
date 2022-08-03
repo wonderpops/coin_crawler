@@ -33,7 +33,7 @@ class MainWidget extends StatelessWidget {
           scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: false,
         home: const MainLayoutWidget(
           restorationId: '0',

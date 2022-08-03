@@ -43,6 +43,10 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Theme.of(context).colorScheme.background,
+      statusBarIconBrightness:
+          Theme.of(context).colorScheme.brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
       systemNavigationBarColor: Theme.of(context).colorScheme.inversePrimary,
     ));
 
@@ -50,6 +54,7 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
       child: Scaffold(
         extendBody: true,
         body: PageTransitionSwitcher(
+          duration: const Duration(milliseconds: 500),
           transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
             return FadeThroughTransition(
               animation: primaryAnimation,
@@ -74,9 +79,9 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
                 _currentIndex.value = index;
               });
             },
-            selectedItemColor: colorScheme.secondary,
-            unselectedItemColor: colorScheme.primary.withOpacity(.3),
-            backgroundColor: colorScheme.primaryContainer,
+            selectedItemColor: colorScheme.inversePrimary,
+            unselectedItemColor: colorScheme.inversePrimary.withOpacity(.4),
+            backgroundColor: colorScheme.primary,
           ),
         ),
       ),
