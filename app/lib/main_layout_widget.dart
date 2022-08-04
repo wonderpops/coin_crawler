@@ -1,4 +1,7 @@
 import 'package:animations/animations.dart';
+import 'package:coin_crawler_app/widgets/coins_screen/coins_screen_widget.dart';
+import 'package:coin_crawler_app/widgets/home_screen/home_screen_widget.dart';
+import 'package:coin_crawler_app/widgets/wallet_screen/wallet_screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,7 +37,7 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    var bottomNavigationBarItems = const <BottomNavigationBarItem>[
+    var bottomNavigationBarItems = const [
       BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
       BottomNavigationBarItem(
           icon: Icon(Icons.monetization_on), label: 'Coins'),
@@ -67,6 +70,8 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
           child: _NavigationDestinationWidget(
             key: UniqueKey(),
             item: bottomNavigationBarItems[_currentIndex.value],
+            index: _currentIndex.value,
+            // selectedTabWidget: tabsWidgets[_currentIndex.value],
           ),
         ),
         bottomNavigationBar: ClipRRect(
@@ -93,27 +98,21 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
 }
 
 class _NavigationDestinationWidget extends StatelessWidget {
-  const _NavigationDestinationWidget({Key? key, required this.item})
+  const _NavigationDestinationWidget(
+      {Key? key, required this.item, required this.index})
       : super(key: key);
 
   final BottomNavigationBarItem item;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: 100,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Theme.of(context).colorScheme.secondaryContainer,
-              ),
-              height: 60,
-            ),
-          );
-        });
+    var tabsWidgets = const <Widget>[
+      HomeScreenWidget(),
+      CoinsScreenWidget(),
+      WalletScreenWidget(),
+    ];
+
+    return tabsWidgets[index];
   }
 }
