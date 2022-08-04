@@ -47,7 +47,8 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
           Theme.of(context).colorScheme.brightness == Brightness.light
               ? Brightness.dark
               : Brightness.light,
-      systemNavigationBarColor: Theme.of(context).colorScheme.inversePrimary,
+      systemNavigationBarColor:
+          Theme.of(context).colorScheme.inversePrimary.withOpacity(.8),
     ));
 
     return SafeArea(
@@ -79,9 +80,11 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
                 _currentIndex.value = index;
               });
             },
-            selectedItemColor: colorScheme.inversePrimary,
-            unselectedItemColor: colorScheme.inversePrimary.withOpacity(.4),
-            backgroundColor: colorScheme.primary,
+            selectedItemColor: colorScheme.brightness == Brightness.light
+                ? colorScheme.background
+                : colorScheme.onBackground,
+            unselectedItemColor: colorScheme.primary.withOpacity(.6),
+            backgroundColor: colorScheme.inversePrimary,
           ),
         ),
       ),
