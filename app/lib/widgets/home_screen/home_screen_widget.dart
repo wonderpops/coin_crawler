@@ -7,7 +7,10 @@ class HomeScreenWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: const [
+        SizedBox(height: 16),
         _TopScreenGreetingWidget(),
+        SizedBox(height: 32),
+        _WalletPreviewWidget()
       ],
     );
   }
@@ -20,7 +23,7 @@ class _TopScreenGreetingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -99,6 +102,79 @@ class _TopScreenGreetingWidget extends StatelessWidget {
             ],
           )
         ],
+      ),
+    );
+  }
+}
+
+class _WalletPreviewWidget extends StatelessWidget {
+  const _WalletPreviewWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        width: double.maxFinite,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: colorScheme.primaryContainer,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Wallet',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: colorScheme.secondary.withOpacity(.4)),
+                      child: const Icon(
+                        Icons.arrow_drop_down,
+                        // color: colorScheme.primary,
+                        size: 24,
+                      ))
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Total balance',
+                style:
+                    TextStyle(fontSize: 18, color: colorScheme.inverseSurface),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    '\$',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const Text(
+                    '0.12412',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    '(+ 0.012)',
+                    style: '(+ 0.012)'.contains('+')
+                        ? const TextStyle(fontSize: 14, color: Colors.green)
+                        : const TextStyle(fontSize: 14, color: Colors.red),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
