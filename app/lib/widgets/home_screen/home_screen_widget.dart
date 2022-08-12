@@ -13,16 +13,16 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: const [
-        SizedBox(height: 16),
-        _TopScreenGreetingWidget(),
-        SizedBox(height: 32),
+      children: [
+        const SizedBox(height: 16),
+        const _TopScreenGreetingWidget(),
+        const SizedBox(height: 32),
         _WalletPreviewWidget(),
-        SizedBox(height: 32),
-        _CoinsPreviewWidget(),
-        SizedBox(height: 32),
-        _LastActionsWidget(),
-        SizedBox(height: 32),
+        const SizedBox(height: 32),
+        const _CoinsPreviewWidget(),
+        const SizedBox(height: 32),
+        const _LastActionsWidget(),
+        const SizedBox(height: 32),
       ],
     );
   }
@@ -119,9 +119,15 @@ class _TopScreenGreetingWidget extends StatelessWidget {
   }
 }
 
-class _WalletPreviewWidget extends StatelessWidget {
-  const _WalletPreviewWidget({Key? key}) : super(key: key);
+class _WalletPreviewWidget extends StatefulWidget {
+  _WalletPreviewWidget({Key? key}) : super(key: key);
+  bool isOpen = false;
 
+  @override
+  State<_WalletPreviewWidget> createState() => _WalletPreviewWidgetState();
+}
+
+class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -149,12 +155,23 @@ class _WalletPreviewWidget extends StatelessWidget {
                   ),
                   Container(
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: colorScheme.secondary.withOpacity(.4)),
-                      child: const Icon(
-                        Icons.arrow_drop_down,
-                        // color: colorScheme.primary,
-                        size: 24,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Material(
+                          color: colorScheme.secondary.withOpacity(.4),
+                          child: IconButton(
+                            onPressed: () {
+                              widget.isOpen = !widget.isOpen;
+                              setState(() {});
+                            },
+                            padding: const EdgeInsets.all(4),
+                            icon: Icon(widget.isOpen
+                                ? Icons.arrow_drop_up
+                                : Icons.arrow_drop_down),
+                          ),
+                        ),
                       ))
                 ],
               ),
@@ -184,6 +201,12 @@ class _WalletPreviewWidget extends StatelessWidget {
                   ),
                 ],
               ),
+              AnimatedContainer(
+                curve: Curves.fastOutSlowIn,
+                duration: const Duration(seconds: 1),
+                height: widget.isOpen ? 200 : 0,
+                child: Placeholder(),
+              )
             ],
           ),
         ),
