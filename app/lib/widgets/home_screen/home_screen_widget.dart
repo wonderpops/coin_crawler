@@ -1,16 +1,26 @@
+import 'dart:math';
+
+import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreenWidget extends StatelessWidget {
+class HomeScreenWidget extends StatefulWidget {
   const HomeScreenWidget({Key? key}) : super(key: key);
 
   @override
+  State<HomeScreenWidget> createState() => _HomeScreenWidgetState();
+}
+
+class _HomeScreenWidgetState extends State<HomeScreenWidget> {
+  @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        SizedBox(height: 16),
-        _TopScreenGreetingWidget(),
-        SizedBox(height: 32),
-        _WalletPreviewWidget()
+      children: [
+        const SizedBox(height: 16),
+        const _TopScreenGreetingWidget(),
+        const SizedBox(height: 32),
+        const _WalletPreviewWidget(),
+        const SizedBox(height: 32),
+        _CoinsPreviewWidget(),
       ],
     );
   }
@@ -96,8 +106,8 @@ class _TopScreenGreetingWidget extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: colorScheme.inversePrimary,
-                child: const Icon(Icons.person_outline_outlined,
-                    color: Colors.white),
+                child: Icon(Icons.person_outline_outlined,
+                    color: colorScheme.inverseSurface),
               ),
             ],
           )
@@ -120,7 +130,7 @@ class _WalletPreviewWidget extends StatelessWidget {
         width: double.maxFinite,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: colorScheme.primaryContainer,
+          color: colorScheme.secondaryContainer,
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -176,6 +186,160 @@ class _WalletPreviewWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CoinsPreviewWidget extends StatefulWidget {
+  _CoinsPreviewWidget({Key? key}) : super(key: key);
+
+  @override
+  State<_CoinsPreviewWidget> createState() => _CoinsPreviewWidgetState();
+}
+
+class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
+  late PageController _carouselPageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _carouselPageController =
+        PageController(initialPage: _currentPage, viewportFraction: 0.6);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _carouselPageController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    int listLength = dataList.length;
+    int currentPageIncremented = _currentPage + 1;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Row(
+            children: [
+              const Text('Coins ',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('($currentPageIncremented/$listLength)',
+                  style: const TextStyle(fontSize: 18)),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 250,
+          child: PageView.builder(
+              itemCount: dataList.length,
+              physics: const ClampingScrollPhysics(),
+              controller: _carouselPageController,
+              onPageChanged: (value) {
+                _currentPage = value;
+                setState(() {});
+              },
+              itemBuilder: (context, index) {
+                return carouselView(context, index);
+              }),
+        ),
+      ],
+    );
+  }
+
+  Widget carouselView(context, int index) {
+    return AnimatedBuilder(
+      animation: _carouselPageController,
+      builder: (context, child) {
+        double value = 0;
+        if (_carouselPageController.position.haveDimensions) {
+          if (index.toDouble() > (_carouselPageController.page ?? 0)) {
+            value = (0.5 /
+                    ((_carouselPageController.page ?? 0) - index.toDouble())
+                        .abs()) +
+                0.25;
+          } else if (index.toDouble() < (_carouselPageController.page ?? 0)) {
+            value = (0.5 /
+                    (((_carouselPageController.page ?? 0) - index.toDouble()) *
+                            -1)
+                        .abs()) +
+                0.25;
+          } else {
+            value = (_carouselPageController.page ?? 0) + index.toDouble() == 0
+                ? 1
+                : index.toDouble();
+          }
+          // value = (_carouselPageController.page ?? 0) - index.toDouble() + 1;
+          value = (value).clamp(0.5, 1);
+        } else if (index.toDouble() == 0) {
+          value = 1;
+        } else {
+          value = 0.75;
+        }
+        print("value $value index $index");
+        return Transform.scale(
+          scale: value.abs(),
+          child: carouselCard(dataList[index]),
+        );
+      },
+    );
+  }
+
+  Widget carouselCard(CoinsPreviewCardDataModel data) {
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Hero(
+              tag: data.shortName,
+              child: GestureDetector(
+                onTap: () {
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => DetailsScreen(data: data)));
+                },
+                child: Container(
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: const [
+                        BoxShadow(
+                            offset: Offset(0, 4),
+                            blurRadius: 4,
+                            color: Colors.black26)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: Text(data.shortName,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ),
+                        const Flexible(flex: 2, child: Placeholder()),
+                        const Flexible(
+                          flex: 1,
+                          child: Text('Total: 10.344\$',
+                              style: TextStyle(fontSize: 18)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
