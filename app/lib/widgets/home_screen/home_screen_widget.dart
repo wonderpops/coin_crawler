@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +12,17 @@ class HomeScreenWidget extends StatefulWidget {
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        const _TopScreenGreetingWidget(),
-        const SizedBox(height: 32),
-        const _WalletPreviewWidget(),
-        const SizedBox(height: 32),
+    return ListView(
+      children: const [
+        SizedBox(height: 16),
+        _TopScreenGreetingWidget(),
+        SizedBox(height: 32),
+        _WalletPreviewWidget(),
+        SizedBox(height: 32),
         _CoinsPreviewWidget(),
+        SizedBox(height: 32),
+        _LastActionsWidget(),
+        SizedBox(height: 32),
       ],
     );
   }
@@ -327,7 +328,7 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                             Flexible(
                               flex: 0,
                               child: Text(data.shortName,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                             ),
@@ -348,6 +349,114 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LastActionsWidget extends StatefulWidget {
+  const _LastActionsWidget({Key? key}) : super(key: key);
+
+  @override
+  State<_LastActionsWidget> createState() => _LastActionsWidgetState();
+}
+
+class _LastActionsWidgetState extends State<_LastActionsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Last actions',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: colorScheme.secondaryContainer),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Table(
+                    border: TableBorder(
+                        horizontalInside:
+                            BorderSide(color: colorScheme.onBackground)),
+                    columnWidths: const {
+                      0: FlexColumnWidth(2),
+                      2: FlexColumnWidth(1),
+                      3: FlexColumnWidth(1),
+                      4: FlexColumnWidth(4)
+                    },
+                    children: actionsList.map<TableRow>((d) {
+                      return TableRow(children: [
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.bottom,
+                          child: SizedBox(
+                            height: 60,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                d.coinShortName,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Text(
+                            d.profit.toString(),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Text(
+                            d.actionType,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        const TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Text(
+                            // TODO replace with real date
+                            '20:30 02/08',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ]);
+                    }).toList(),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      actionsList += [
+                        ActionPreviewDataModel(
+                            'MATIC/BUSD', 10.2, 0.3, 'sell', DateTime.now()),
+                        ActionPreviewDataModel(
+                            'MATIC/BUSD', 9.4, 0.9, 'buy', DateTime.now()),
+                        ActionPreviewDataModel(
+                            'MATIC/BUSD', 12.1, 0.2, 'sell', DateTime.now()),
+                        ActionPreviewDataModel(
+                            'MATIC/BUSD', 42.05, 0.312, 'sell', DateTime.now()),
+                        ActionPreviewDataModel(
+                            'MATIC/BUSD', 123, 12.34, 'buy', DateTime.now()),
+                      ];
+                      setState(() {});
+                    },
+                    child: const Text('Load more...'),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
