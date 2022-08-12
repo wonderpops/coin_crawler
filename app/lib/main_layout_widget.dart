@@ -86,9 +86,9 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
               });
             },
             selectedItemColor: colorScheme.brightness == Brightness.light
-                ? colorScheme.background
+                ? colorScheme.onBackground
                 : colorScheme.onBackground,
-            unselectedItemColor: colorScheme.primary.withOpacity(.6),
+            unselectedItemColor: colorScheme.secondary.withOpacity(.5),
             backgroundColor: colorScheme.inversePrimary,
           ),
         ),
