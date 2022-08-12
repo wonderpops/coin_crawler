@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:flutter/material.dart';
 
@@ -191,7 +192,7 @@ class _WalletPreviewWidget extends StatelessWidget {
 }
 
 class _CoinsPreviewWidget extends StatefulWidget {
-  _CoinsPreviewWidget({Key? key}) : super(key: key);
+  const _CoinsPreviewWidget({Key? key}) : super(key: key);
 
   @override
   State<_CoinsPreviewWidget> createState() => _CoinsPreviewWidgetState();
@@ -296,42 +297,49 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
             padding: const EdgeInsets.all(8.0),
             child: Hero(
               tag: data.shortName,
-              child: GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => DetailsScreen(data: data)));
-                },
-                child: Container(
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: const [
-                        BoxShadow(
-                            offset: Offset(0, 4),
-                            blurRadius: 4,
-                            color: Colors.black26)
-                      ]),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: Text(data.shortName,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  CoinScreenWidget(data: data)));
+                    },
+                    child: Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: const [
+                            BoxShadow(
+                                offset: Offset(0, 4),
+                                blurRadius: 4,
+                                color: Colors.black26)
+                          ]),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              flex: 0,
+                              child: Text(data.shortName,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            const Flexible(flex: 2, child: Placeholder()),
+                            const Flexible(
+                              flex: 0,
+                              child: Text('Total: 10.344\$',
+                                  style: TextStyle(fontSize: 18)),
+                            ),
+                          ],
                         ),
-                        const Flexible(flex: 2, child: Placeholder()),
-                        const Flexible(
-                          flex: 1,
-                          child: Text('Total: 10.344\$',
-                              style: TextStyle(fontSize: 18)),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

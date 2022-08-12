@@ -7,7 +7,7 @@ class CoinsPreviewCardDataModel {
 
 List<CoinsPreviewCardDataModel> dataList = [
   CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BUSD"),
-  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BUSD"),
-  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BUSD"),
-  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BUSD"),
+  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BUS"),
+  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/BU"),
+  CoinsPreviewCardDataModel("Polygon matic / Binance USD", "MATIC/B"),
 ];
