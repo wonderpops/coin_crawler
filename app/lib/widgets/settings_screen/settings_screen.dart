@@ -1,7 +1,5 @@
 import 'package:coin_crawler_app/widgets/settings_screen/settings_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class SettingsScreenWidget extends StatelessWidget {
   const SettingsScreenWidget({Key? key}) : super(key: key);
@@ -17,8 +15,48 @@ class SettingsScreenWidget extends StatelessWidget {
         backgroundColor: colorScheme.background,
         body: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(children: [_BinanceAPISettingsWidget()]),
+          child: Column(
+              children: [const _UserAvatar(), _BinanceAPISettingsWidget()]),
         ),
+      ),
+    );
+  }
+}
+
+class _UserAvatar extends StatelessWidget {
+  const _UserAvatar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Hero(
+      tag: 'user',
+      child: Stack(
+        children: [
+          CircleAvatar(
+            radius: 60,
+            backgroundColor: colorScheme.inversePrimary,
+            child: Icon(
+              Icons.person_outline_outlined,
+              color: colorScheme.inverseSurface,
+              size: 50,
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {},
+              splashColor: colorScheme.tertiary.withOpacity(.3),
+              hoverColor: colorScheme.tertiary.withOpacity(.3),
+              borderRadius: BorderRadius.circular(60),
+              child: Container(
+                alignment: Alignment.center,
+                width: 120,
+                height: 120,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

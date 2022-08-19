@@ -106,35 +106,38 @@ class _TopScreenGreetingWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16),
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: colorScheme.inversePrimary,
-                    child: Icon(Icons.person_outline_outlined,
-                        color: colorScheme.inverseSurface),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const SettingsScreenWidget()));
-                      },
-                      splashColor: colorScheme.tertiary.withOpacity(.3),
-                      hoverColor: colorScheme.tertiary.withOpacity(.3),
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: 60,
-                        height: 60,
+              Hero(
+                tag: 'user',
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: colorScheme.inversePrimary,
+                      child: Icon(Icons.person_outline_outlined,
+                          color: colorScheme.inverseSurface),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SettingsScreenWidget()));
+                        },
+                        splashColor: colorScheme.tertiary.withOpacity(.3),
+                        hoverColor: colorScheme.tertiary.withOpacity(.3),
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: 60,
+                          height: 60,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           )
