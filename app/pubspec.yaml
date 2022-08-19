@@ -30,6 +30,7 @@ dependencies:
   dynamic_color: ^1.4.0
   animations: ^2.0.3
   flutter_secure_storage: ^6.0.0
+  shared_preferences: ^2.0.15
   flutter:
     sdk: flutter
 
