@@ -1,5 +1,6 @@
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
+import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenWidget extends StatefulWidget {
@@ -105,11 +106,35 @@ class _TopScreenGreetingWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16),
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: colorScheme.inversePrimary,
-                child: Icon(Icons.person_outline_outlined,
-                    color: colorScheme.inverseSurface),
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: colorScheme.inversePrimary,
+                    child: Icon(Icons.person_outline_outlined,
+                        color: colorScheme.inverseSurface),
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const SettingsScreenWidget()));
+                      },
+                      splashColor: colorScheme.tertiary.withOpacity(.3),
+                      hoverColor: colorScheme.tertiary.withOpacity(.3),
+                      borderRadius: BorderRadius.circular(30),
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           )
