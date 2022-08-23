@@ -1,5 +1,10 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:coin_crawler_app/widgets/settings_screen/settings_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../blocs/app_settings_bloc/app_settings_bloc.dart';
 
 class SettingsScreenWidget extends StatelessWidget {
   const SettingsScreenWidget({Key? key}) : super(key: key);
@@ -20,7 +25,7 @@ class SettingsScreenWidget extends StatelessWidget {
             const SizedBox(height: 32),
             _ProfileSettingsWidget(),
             const SizedBox(height: 32),
-            _AppSettingsWidget(),
+            const _AppSettingsWidget(),
             const SizedBox(height: 32),
             _BinanceAPISettingsWidget()
           ]),
@@ -137,7 +142,7 @@ class __ProfileSettingsWidgetState extends State<_ProfileSettingsWidget> {
 }
 
 class _AppSettingsWidget extends StatefulWidget {
-  _AppSettingsWidget({Key? key}) : super(key: key);
+  const _AppSettingsWidget({Key? key}) : super(key: key);
 
   @override
   State<_AppSettingsWidget> createState() => __AppSettingsState();
@@ -162,7 +167,6 @@ class __AppSettingsState extends State<_AppSettingsWidget> {
   final _settingsProvider = SettingsProvider();
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -177,12 +181,14 @@ class __AppSettingsState extends State<_AppSettingsWidget> {
             decoration:
                 const InputDecoration(label: Text('Selected app theme')),
             items: const <DropdownMenuItem<String>>[
-              DropdownMenuItem(child: Text('Light theme'), value: 'Light'),
-              DropdownMenuItem(child: Text('Dark theme'), value: 'Dark'),
-              DropdownMenuItem(child: Text('Auto colors theme'), value: 'Auto')
+              DropdownMenuItem(value: 'Light', child: Text('Light theme')),
+              DropdownMenuItem(value: 'Dark', child: Text('Dark theme')),
+              DropdownMenuItem(value: 'Auto', child: Text('System theme'))
             ],
-            onChanged: (value) {
-              _settingsProvider.setAppThemeMode(value.toString());
+            onChanged: (value) async {
+              final settingsBloc = BlocProvider.of<AppSettingsBloc>(context);
+              await _settingsProvider.setAppThemeMode(value.toString());
+              settingsBloc.add(AppSettingsChangedEvent());
             }),
       ],
     );

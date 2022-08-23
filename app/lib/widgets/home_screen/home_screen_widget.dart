@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
@@ -332,7 +334,7 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
         } else {
           value = 0.75;
         }
-        print("value $value index $index");
+        // print("value $value index $index");
         return Transform.scale(
           scale: value.abs(),
           child: carouselCard(dataList[index]),
