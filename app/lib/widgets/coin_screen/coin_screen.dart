@@ -1,10 +1,11 @@
+import 'package:binance_spot/binance_spot.dart';
 import 'package:flutter/material.dart';
 
 import '../home_screen/models.dart';
 
 class CoinScreenWidget extends StatefulWidget {
   const CoinScreenWidget({Key? key, required this.data}) : super(key: key);
-  final CoinsPreviewCardDataModel data;
+  final Balance data;
 
   @override
   State<CoinScreenWidget> createState() => _CoinScreenState();
@@ -15,14 +16,14 @@ class _CoinScreenState extends State<CoinScreenWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.data.name, style: const TextStyle(fontSize: 22)),
+        title: Text(widget.data.asset, style: const TextStyle(fontSize: 22)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Hero(
-              tag: widget.data.shortName,
+              tag: widget.data.asset,
               child: Material(
                 type: MaterialType.transparency,
                 child: Container(

@@ -53,7 +53,6 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
       systemNavigationBarColor:
           Theme.of(context).colorScheme.inversePrimary.withOpacity(.8),
     ));
-
     return SafeArea(
       child: Scaffold(
         extendBody: true,

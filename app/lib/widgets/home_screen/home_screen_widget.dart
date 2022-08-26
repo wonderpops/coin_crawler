@@ -1,9 +1,16 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:developer';
+
+import 'package:binance_spot/binance_spot.dart';
+import 'package:coin_crawler_app/blocs/binance_api_bloc/binance_api_bloc.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../settings_screen/settings_provider.dart';
 
 class HomeScreenWidget extends StatefulWidget {
   const HomeScreenWidget({Key? key}) : super(key: key);
@@ -13,6 +20,11 @@ class HomeScreenWidget extends StatefulWidget {
 }
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -159,87 +171,223 @@ class _WalletPreviewWidget extends StatefulWidget {
 
 class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  Text _calcWalletProfit(List snapshots, int period) {
+    double diff = (snapshots[0].data.totalAssetOfBtc -
+        snapshots[period].data.totalAssetOfBtc);
+
+    // print(
+    //     'a: ${snapshots[0].data.totalAssetOfBtc}, b: ${snapshots[period].data.totalAssetOfBtc}, diff: $diff');
+
+    // diff = roundDouble(diff, 8);
+
+    if (diff > 0) {
+      return Text('+${diff.toStringAsFixed(8)}',
+          style: const TextStyle(fontSize: 14, color: Colors.green));
+    } else if (diff < 0) {
+      return Text(
+        '${diff.toStringAsFixed(8)}',
+        style: const TextStyle(fontSize: 14, color: Colors.red),
+      );
+    } else {
+      return Text(
+        diff.toString(),
+        style: const TextStyle(fontSize: 14),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        width: double.maxFinite,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: colorScheme.secondaryContainer,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final bloc = context.watch<BinanceAPIBloc>();
+
+    if (bloc.state is! BinanceAPIWalletPreviewLoadedState) {
+      bloc.add(LoadWalletPreviewEvent());
+    }
+
+    // if (bloc.state is BinanceAPIWalletPreviewLoadedState) {
+    //   print(bloc.state);
+    // }
+
+    return BlocConsumer<BinanceAPIBloc, BinanceAPIState>(
+        listener: (context, state) {
+      if (state is BinanceAPIWalletPreviewLoadedState) {
+        inspect(state.walletPreviewData.data);
+      }
+    }, builder: (context, state) {
+      if (state is BinanceAPIWalletPreviewLoadedState) {
+        final snapshots = state.walletPreviewData.data.snapshotVos;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: colorScheme.secondaryContainer,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Wallet',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Wallet',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Material(
-                          color: colorScheme.secondary.withOpacity(.4),
-                          child: IconButton(
-                            onPressed: () {
-                              widget.isOpen = !widget.isOpen;
-                              setState(() {});
-                            },
-                            padding: const EdgeInsets.all(4),
-                            icon: Icon(widget.isOpen
-                                ? Icons.arrow_drop_up
-                                : Icons.arrow_drop_down),
+                      Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        ),
-                      ))
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Total balance',
-                style:
-                    TextStyle(fontSize: 18, color: colorScheme.inverseSurface),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    '\$',
-                    style: TextStyle(fontSize: 14),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: Material(
+                              color: colorScheme.secondary.withOpacity(.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  widget.isOpen = !widget.isOpen;
+                                  setState(() {});
+                                },
+                                padding: const EdgeInsets.all(4),
+                                icon: Icon(widget.isOpen
+                                    ? Icons.arrow_drop_up
+                                    : Icons.arrow_drop_down),
+                              ),
+                            ),
+                          ))
+                    ],
                   ),
-                  const Text(
-                    '0.12412',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  const SizedBox(width: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    '(+ 0.012)',
-                    style: '(+ 0.012)'.contains('+')
-                        ? const TextStyle(fontSize: 14, color: Colors.green)
-                        : const TextStyle(fontSize: 14, color: Colors.red),
+                    'Total balance',
+                    style: TextStyle(
+                        fontSize: 18, color: colorScheme.inverseSurface),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'BTC ',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        snapshots[0].data.totalAssetOfBtc.toString(),
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      _calcWalletProfit(snapshots, 1),
+                    ],
+                  ),
+                  AnimatedContainer(
+                    curve: Curves.fastOutSlowIn,
+                    duration: const Duration(seconds: 1),
+                    height: widget.isOpen ? 200 : 0,
+                    child: Placeholder(),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: colorScheme.secondaryContainer,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Wallet',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: Material(
+                              color: colorScheme.secondary.withOpacity(.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  widget.isOpen = !widget.isOpen;
+                                  setState(() {});
+                                },
+                                padding: const EdgeInsets.all(4),
+                                icon: Icon(widget.isOpen
+                                    ? Icons.arrow_drop_up
+                                    : Icons.arrow_drop_down),
+                              ),
+                            ),
+                          ))
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Total balance',
+                    style: TextStyle(
+                        fontSize: 18, color: colorScheme.inverseSurface),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'BTC',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      const Text(
+                        'Loading...',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '(+ 0.012)',
+                        style: '(+ 0.012)'.contains('+')
+                            ? const TextStyle(fontSize: 14, color: Colors.green)
+                            : const TextStyle(fontSize: 14, color: Colors.red),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              AnimatedContainer(
-                curve: Curves.fastOutSlowIn,
-                duration: const Duration(seconds: 1),
-                height: widget.isOpen ? 200 : 0,
-                child: Placeholder(),
-              )
-            ],
+            ),
           ),
-        ),
+        );
+      }
+    });
+  }
+}
+
+class _CoinBalancePreview extends StatelessWidget {
+  const _CoinBalancePreview({Key? key, required this.b}) : super(key: key);
+  final Balance b;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        children: [Text(b.asset), Text(b.free.toString())],
       ),
     );
   }
@@ -271,41 +419,84 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    int listLength = dataList.length;
-    int currentPageIncremented = _currentPage + 1;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Row(
+    return BlocBuilder<BinanceAPIBloc, BinanceAPIState>(
+      builder: (context, state) {
+        if (state is BinanceAPIWalletPreviewLoadedState) {
+          final snapshot = state.walletPreviewData.data.snapshotVos[0];
+          int listLength = snapshot.data.balances.length;
+          int currentPageIncremented = _currentPage + 1;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Coins ',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              Text('($currentPageIncremented/$listLength)',
-                  style: const TextStyle(fontSize: 18)),
+              Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  children: [
+                    const Text('Coins ',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text('($currentPageIncremented/$listLength)',
+                        style: const TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 250,
+                child: PageView.builder(
+                    itemCount: listLength,
+                    physics: const ClampingScrollPhysics(),
+                    controller: _carouselPageController,
+                    onPageChanged: (value) {
+                      _currentPage = value;
+                      setState(() {});
+                    },
+                    itemBuilder: (context, index) {
+                      return carouselView(
+                          context, index, snapshot.data.balances);
+                    }),
+              ),
             ],
-          ),
-        ),
-        SizedBox(
-          height: 250,
-          child: PageView.builder(
-              itemCount: dataList.length,
-              physics: const ClampingScrollPhysics(),
-              controller: _carouselPageController,
-              onPageChanged: (value) {
-                _currentPage = value;
-                setState(() {});
-              },
-              itemBuilder: (context, index) {
-                return carouselView(context, index);
-              }),
-        ),
-      ],
+          );
+        } else {
+          int listLength = 2;
+          int currentPageIncremented = _currentPage + 1;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  children: [
+                    const Text('Coins ',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text('($currentPageIncremented/)',
+                        style: const TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ),
+              // SizedBox(
+              //   height: 250,
+              //   child: PageView.builder(
+              //       itemCount: dataList.length,
+              //       physics: const ClampingScrollPhysics(),
+              //       controller: _carouselPageController,
+              //       onPageChanged: (value) {
+              //         _currentPage = value;
+              //         setState(() {});
+              //       },
+              //       itemBuilder: (context, index) {
+              //         return carouselView(context, index, dataList);
+              //       }),
+              // ),
+            ],
+          );
+        }
+      },
     );
   }
 
-  Widget carouselView(context, int index) {
+  Widget carouselView(context, int index, List coins) {
     return AnimatedBuilder(
       animation: _carouselPageController,
       builder: (context, child) {
@@ -335,22 +526,26 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
           value = 0.75;
         }
         // print("value $value index $index");
-        return Transform.scale(
-          scale: value.abs(),
-          child: carouselCard(dataList[index]),
+        return BlocBuilder<BinanceAPIBloc, BinanceAPIState>(
+          builder: (context, state) {
+            return Transform.scale(
+              scale: value.abs(),
+              child: carouselCard(coins[index]),
+            );
+          },
         );
       },
     );
   }
 
-  Widget carouselCard(CoinsPreviewCardDataModel data) {
+  Widget carouselCard(Balance data) {
     return Column(
       children: <Widget>[
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Hero(
-              tag: data.shortName,
+              tag: data.asset,
               child: Material(
                 type: MaterialType.transparency,
                 child: InkWell(
@@ -380,16 +575,16 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                           children: [
                             Flexible(
                               flex: 0,
-                              child: Text(data.shortName,
+                              child: Text(data.asset,
                                   style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                             ),
                             const Flexible(flex: 2, child: Placeholder()),
-                            const Flexible(
+                            Flexible(
                               flex: 0,
-                              child: Text('Total: 10.344\$',
-                                  style: TextStyle(fontSize: 18)),
+                              child: Text('Total: ${data.free} ${data.asset}',
+                                  style: const TextStyle(fontSize: 18)),
                             ),
                           ],
                         ),

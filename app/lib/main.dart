@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:coin_crawler_app/blocs/binance_api_bloc/binance_api_bloc.dart';
 import 'package:coin_crawler_app/main_layout_widget.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,6 @@ class _MainWidgetState extends State<MainWidget> {
     final settingsProvider = SettingsProvider();
     settingsProvider.appThemeMode.then((value) {
       widget.themeMode = value;
-      setState(() {});
     });
     super.initState();
   }
@@ -44,27 +44,29 @@ class _MainWidgetState extends State<MainWidget> {
   @override
   Widget build(BuildContext context) {
     final settingsBloc = AppSettingsBloc();
+    final binanceAPIBloc = BinanceAPIBloc();
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => settingsBloc)],
-      child: DynamicColorBuilder(
-          builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        return BlocBuilder<AppSettingsBloc, AppSettingsState>(
+        providers: [
+          BlocProvider(create: (context) => settingsBloc),
+          BlocProvider(create: (context) => binanceAPIBloc),
+        ],
+        child: BlocBuilder<AppSettingsBloc, AppSettingsState>(
           bloc: settingsBloc,
           builder: (context, state) {
             if (state is AppSettingsChangedState) {
               return MaterialApp(
                 title: 'Coin Crawler',
                 theme: ThemeData(
-                  colorScheme:
-                      lightDynamic ?? MainWidget._defaultLightColorScheme,
+                  // colorScheme:
+                  //     lightDynamic ?? MainWidget._defaultLightColorScheme,
                   brightness: Brightness.light,
                   useMaterial3: true,
                 ),
                 darkTheme: ThemeData(
-                  colorScheme:
-                      darkDynamic ?? MainWidget._defaultDarkColorScheme,
+                  // colorScheme:
+                  //     darkDynamic ?? MainWidget._defaultDarkColorScheme,
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
+                  // scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
                   useMaterial3: true,
                 ),
                 themeMode: state.appSettings.appThemeMode == 'Light'
@@ -81,16 +83,16 @@ class _MainWidgetState extends State<MainWidget> {
               return MaterialApp(
                 title: 'Coin Crawler',
                 theme: ThemeData(
-                  colorScheme:
-                      lightDynamic ?? MainWidget._defaultLightColorScheme,
+                  // colorScheme:
+                  //     lightDynamic ?? MainWidget._defaultLightColorScheme,
                   brightness: Brightness.light,
                   useMaterial3: true,
                 ),
                 darkTheme: ThemeData(
-                  colorScheme:
-                      darkDynamic ?? MainWidget._defaultDarkColorScheme,
+                  // colorScheme:
+                  //     darkDynamic ?? MainWidget._defaultDarkColorScheme,
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
+                  // scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
                   useMaterial3: true,
                 ),
                 themeMode: widget.themeMode == 'Light'
@@ -105,8 +107,6 @@ class _MainWidgetState extends State<MainWidget> {
               );
             }
           },
-        );
-      })),
-    );
+        ));
   }
 }
