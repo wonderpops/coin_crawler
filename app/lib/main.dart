@@ -32,6 +32,7 @@ class _MainWidgetState extends State<MainWidget> {
     final settingsProvider = SettingsProvider();
     settingsProvider.appThemeMode.then((value) {
       widget.themeMode = value;
+      setState(() {});
     });
     super.initState();
   }
@@ -57,16 +58,14 @@ class _MainWidgetState extends State<MainWidget> {
               return MaterialApp(
                 title: 'Coin Crawler',
                 theme: ThemeData(
-                  // colorScheme:
-                  //     lightDynamic ?? MainWidget._defaultLightColorScheme,
+                  colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
                   brightness: Brightness.light,
                   useMaterial3: true,
                 ),
                 darkTheme: ThemeData(
-                  // colorScheme:
-                  //     darkDynamic ?? MainWidget._defaultDarkColorScheme,
+                  colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
                   brightness: Brightness.dark,
-                  // scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
+                  scaffoldBackgroundColor: Color.fromRGBO(14, 14, 14, 1),
                   useMaterial3: true,
                 ),
                 themeMode: state.appSettings.appThemeMode == 'Light'
@@ -83,16 +82,14 @@ class _MainWidgetState extends State<MainWidget> {
               return MaterialApp(
                 title: 'Coin Crawler',
                 theme: ThemeData(
-                  // colorScheme:
-                  //     lightDynamic ?? MainWidget._defaultLightColorScheme,
+                  colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
                   brightness: Brightness.light,
                   useMaterial3: true,
                 ),
                 darkTheme: ThemeData(
-                  // colorScheme:
-                  //     darkDynamic ?? MainWidget._defaultDarkColorScheme,
+                  colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
                   brightness: Brightness.dark,
-                  // scaffoldBackgroundColor: darkDynamic?.surfaceVariant,
+                  scaffoldBackgroundColor: Color.fromRGBO(14, 14, 14, 1),
                   useMaterial3: true,
                 ),
                 themeMode: widget.themeMode == 'Light'
