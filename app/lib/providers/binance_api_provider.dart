@@ -19,7 +19,9 @@ class BinanceAPIProvider {
         await binanceSpot.dailyAccountSnapshot(type: 'SPOT', recvWindow: 10000);
 
     // final walletData.left =
-
+    if (walletData.isLeft) {
+      print(walletData.left);
+    }
     return {
       'walletData': walletData.isRight ? walletData.right : walletData.left,
     };

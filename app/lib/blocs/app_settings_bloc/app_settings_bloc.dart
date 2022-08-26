@@ -7,7 +7,18 @@ part 'app_settings_state.dart';
 
 class AppSettingsBloc extends Bloc<AppSettingsEvent, AppSettingsState> {
   AppSettingsBloc() : super(AppSettingsInitial()) {
+    on<AppSettingsLoadedEvent>(onLoadedAppSettings);
     on<AppSettingsChangedEvent>(onChangedAppSettings);
+  }
+
+  onLoadedAppSettings(
+      AppSettingsLoadedEvent event, Emitter<AppSettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? appThemeMode = prefs.getString('appThemeMode');
+
+    final appSettings = AppSettings(appThemeMode: appThemeMode!);
+
+    emit(AppSettingsLoadededState(appSettings));
   }
 
   onChangedAppSettings(

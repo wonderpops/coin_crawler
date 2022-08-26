@@ -10,3 +10,5 @@ class AppGetAppSettings extends AppSettingsEvent {
 }
 
 class AppSettingsChangedEvent extends AppSettingsEvent {}
+
+class AppSettingsLoadedEvent extends AppSettingsEvent {}

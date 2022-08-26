@@ -5,6 +5,12 @@ abstract class AppSettingsState {}
 
 class AppSettingsInitial extends AppSettingsState {}
 
+class AppSettingsLoadededState extends AppSettingsState {
+  final AppSettings appSettings;
+
+  AppSettingsLoadededState(this.appSettings);
+}
+
 class AppSettingsChangedState extends AppSettingsState {
   final AppSettings appSettings;
 

@@ -214,6 +214,8 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
     //   print(bloc.state);
     // }
 
+    print(bloc.state);
+
     return BlocConsumer<BinanceAPIBloc, BinanceAPIState>(
         listener: (context, state) {
       if (state is BinanceAPIWalletPreviewLoadedState) {
