@@ -14,10 +14,13 @@ class BinanceAPIBloc extends Bloc<BinanceAPIEvent, BinanceAPIState> {
 
   onLoadWalletPreview(
       LoadWalletPreviewEvent event, Emitter<BinanceAPIState> emit) async {
+    emit(BinanceAPIWalletPreviewLoadingState());
     final walletData = await _bAPIProvider.loadWalletPreviewData();
     print('data_loaded');
-
-    emit(BinanceAPIWalletPreviewLoadedState(
-        WalletPreviewData(data: walletData['walletData'])));
+    if (walletData['walletData'] is Snapshots) {
+      emit(BinanceAPIWalletPreviewLoadedState(
+          WalletPreviewData(data: walletData['walletData'])));
+    }
+    // await Future.delayed(Duration(seconds: 3));
   }
 }

@@ -16,7 +16,7 @@ class AppSettingsBloc extends Bloc<AppSettingsEvent, AppSettingsState> {
     final prefs = await SharedPreferences.getInstance();
     final String? appThemeMode = prefs.getString('appThemeMode');
 
-    final appSettings = AppSettings(appThemeMode: appThemeMode!);
+    final appSettings = AppSettings(appThemeMode: appThemeMode ?? 'Light');
 
     emit(AppSettingsLoadededState(appSettings));
   }

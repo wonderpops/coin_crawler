@@ -33,6 +33,7 @@ dependencies:
   shared_preferences: ^2.0.15
   flutter_bloc: ^8.1.1
   binance_spot: ^0.0.2
+  shimmer: ^2.0.0
   flutter:
     sdk: flutter
 

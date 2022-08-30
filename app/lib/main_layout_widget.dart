@@ -106,10 +106,10 @@ class _NavigationDestinationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tabsWidgets = const <Widget>[
+    var tabsWidgets = <Widget>[
       HomeScreenWidget(),
-      CoinsScreenWidget(),
-      WalletScreenWidget(),
+      const CoinsScreenWidget(),
+      const WalletScreenWidget(),
     ];
 
     return tabsWidgets[index];

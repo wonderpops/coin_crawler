@@ -5,6 +5,8 @@ abstract class BinanceAPIState {}
 
 class BinanceApiInitial extends BinanceAPIState {}
 
+class BinanceAPIWalletPreviewLoadingState extends BinanceAPIState {}
+
 class BinanceAPIWalletPreviewLoadedState extends BinanceAPIState {
   final WalletPreviewData walletPreviewData;
 

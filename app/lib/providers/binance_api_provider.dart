@@ -16,7 +16,7 @@ class BinanceAPIProvider {
   Future<Map<String, dynamic>> loadWalletPreviewData() async {
     BinanceSpot binanceSpot = await getBinanceAPISwagger();
     final walletData =
-        await binanceSpot.dailyAccountSnapshot(type: 'SPOT', recvWindow: 10000);
+        await binanceSpot.dailyAccountSnapshot(type: 'SPOT', recvWindow: 60000);
 
     // final walletData.left =
     if (walletData.isLeft) {

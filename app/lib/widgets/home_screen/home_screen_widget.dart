@@ -3,17 +3,20 @@
 import 'dart:developer';
 
 import 'package:binance_spot/binance_spot.dart';
+import 'package:coin_crawler_app/blocs/app_settings_bloc/app_settings_bloc.dart';
 import 'package:coin_crawler_app/blocs/binance_api_bloc/binance_api_bloc.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../settings_screen/settings_provider.dart';
 
 class HomeScreenWidget extends StatefulWidget {
-  const HomeScreenWidget({Key? key}) : super(key: key);
+  HomeScreenWidget({Key? key}) : super(key: key);
 
   @override
   State<HomeScreenWidget> createState() => _HomeScreenWidgetState();
@@ -22,23 +25,37 @@ class HomeScreenWidget extends StatefulWidget {
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   @override
   void initState() {
+    final bAPIBloc = context.read<BinanceAPIBloc>();
+    if (bAPIBloc.state is BinanceApiInitial) {
+      bAPIBloc.add(LoadWalletPreviewEvent());
+    }
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const SizedBox(height: 16),
-        const _TopScreenGreetingWidget(),
-        const SizedBox(height: 32),
-        _WalletPreviewWidget(),
-        const SizedBox(height: 32),
-        const _CoinsPreviewWidget(),
-        const SizedBox(height: 32),
-        const _LastActionsWidget(),
-        const SizedBox(height: 32),
-      ],
+    final ColorScheme _colorScheme = Theme.of(context).colorScheme;
+    return RefreshIndicator(
+      onRefresh: () async {
+        final bAPIBloc = context.read<BinanceAPIBloc>();
+        bAPIBloc.add(LoadWalletPreviewEvent());
+        await bAPIBloc.stream.firstWhere(
+            ((element) => element is BinanceAPIWalletPreviewLoadedState));
+      },
+      child: ListView(
+        children: [
+          const SizedBox(height: 16),
+          const _TopScreenGreetingWidget(),
+          const SizedBox(height: 32),
+          _WalletPreviewWidget(),
+          const SizedBox(height: 32),
+          const _CoinsPreviewWidget(),
+          const SizedBox(height: 32),
+          const _LastActionsWidget(),
+          const SizedBox(height: 32),
+        ],
+      ),
     );
   }
 }
@@ -179,18 +196,6 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    final bloc = context.watch<BinanceAPIBloc>();
-
-    if (bloc.state is! BinanceAPIWalletPreviewLoadedState) {
-      bloc.add(LoadWalletPreviewEvent());
-    }
-
-    // if (bloc.state is BinanceAPIWalletPreviewLoadedState) {
-    //   print(bloc.state);
-    // }
-
-    print(bloc.state);
-
     return BlocConsumer<BinanceAPIBloc, BinanceAPIState>(
         listener: (context, state) {
       if (state is BinanceAPIWalletPreviewLoadedState) {
@@ -327,14 +332,18 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                     style: TextStyle(
                         fontSize: 18, color: colorScheme.inverseSurface),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(.2),
-                          borderRadius: BorderRadius.circular(30)),
-                      height: 18,
-                      width: double.maxFinite,
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey,
+                    highlightColor: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(.2),
+                            borderRadius: BorderRadius.circular(30)),
+                        height: 18,
+                        width: double.maxFinite,
+                      ),
                     ),
                   ),
                 ],
@@ -519,12 +528,16 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold)),
                     const Text('(', style: TextStyle(fontSize: 18)),
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.grey.withOpacity(.2)),
-                      height: 26,
-                      width: 35,
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey,
+                      highlightColor: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: Colors.grey.withOpacity(.2)),
+                        height: 26,
+                        width: 35,
+                      ),
                     ),
                     const Text(')', style: TextStyle(fontSize: 18)),
                   ],
@@ -596,14 +609,18 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
   }
 
   Widget notLoadedCarouselCard() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.grey.withOpacity(.2)),
-        height: 250,
-        width: double.maxFinite,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey,
+      highlightColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: Colors.grey.withOpacity(.2)),
+          height: 250,
+          width: double.maxFinite,
+        ),
       ),
     );
   }
