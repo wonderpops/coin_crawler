@@ -331,7 +331,7 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: Colors.grey,
+                          color: Colors.grey.withOpacity(.2),
                           borderRadius: BorderRadius.circular(30)),
                       height: 18,
                       width: double.maxFinite,
@@ -518,25 +518,32 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                     const Text('Coins ',
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text('($currentPageIncremented/)',
-                        style: const TextStyle(fontSize: 18)),
+                    const Text('(', style: TextStyle(fontSize: 18)),
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: Colors.grey.withOpacity(.2)),
+                      height: 26,
+                      width: 35,
+                    ),
+                    const Text(')', style: TextStyle(fontSize: 18)),
                   ],
                 ),
               ),
-              // SizedBox(
-              //   height: 250,
-              //   child: PageView.builder(
-              //       itemCount: dataList.length,
-              //       physics: const ClampingScrollPhysics(),
-              //       controller: _carouselPageController,
-              //       onPageChanged: (value) {
-              //         _currentPage = value;
-              //         setState(() {});
-              //       },
-              //       itemBuilder: (context, index) {
-              //         return carouselView(context, index, dataList);
-              //       }),
-              // ),
+              SizedBox(
+                height: 250,
+                child: PageView.builder(
+                    itemCount: dataList.length,
+                    physics: const ClampingScrollPhysics(),
+                    controller: _carouselPageController,
+                    onPageChanged: (value) {
+                      _currentPage = value;
+                      setState(() {});
+                    },
+                    itemBuilder: (context, index) {
+                      return carouselView(context, index);
+                    }),
+              ),
             ],
           );
         }
@@ -544,7 +551,7 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
     );
   }
 
-  Widget carouselView(context, int index, List coins) {
+  Widget carouselView(context, int index, [List? coins]) {
     return AnimatedBuilder(
       animation: _carouselPageController,
       builder: (context, child) {
@@ -578,7 +585,9 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
           builder: (context, state) {
             return Transform.scale(
               scale: value.abs(),
-              child: carouselCard(coins[index]),
+              child: coins == null
+                  ? notLoadedCarouselCard()
+                  : loadedCarouselCard(coins[index]),
             );
           },
         );
@@ -586,7 +595,20 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
     );
   }
 
-  Widget carouselCard(Balance data) {
+  Widget notLoadedCarouselCard() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.grey.withOpacity(.2)),
+        height: 250,
+        width: double.maxFinite,
+      ),
+    );
+  }
+
+  Widget loadedCarouselCard(Balance data) {
     return Column(
       children: <Widget>[
         Expanded(
@@ -608,14 +630,9 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                     child: Container(
                       width: double.maxFinite,
                       decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: const [
-                            BoxShadow(
-                                offset: Offset(0, 4),
-                                blurRadius: 4,
-                                color: Colors.black26)
-                          ]),
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
