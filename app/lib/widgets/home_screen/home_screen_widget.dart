@@ -175,31 +175,6 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
     super.initState();
   }
 
-  Text _calcWalletProfit(List snapshots, int period) {
-    double diff = (snapshots[0].data.totalAssetOfBtc -
-        snapshots[period].data.totalAssetOfBtc);
-
-    // print(
-    //     'a: ${snapshots[0].data.totalAssetOfBtc}, b: ${snapshots[period].data.totalAssetOfBtc}, diff: $diff');
-
-    // diff = roundDouble(diff, 8);
-
-    if (diff > 0) {
-      return Text('+${diff.toStringAsFixed(8)}',
-          style: const TextStyle(fontSize: 14, color: Colors.green));
-    } else if (diff < 0) {
-      return Text(
-        '${diff.toStringAsFixed(8)}',
-        style: const TextStyle(fontSize: 14, color: Colors.red),
-      );
-    } else {
-      return Text(
-        diff.toString(),
-        style: const TextStyle(fontSize: 14),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -278,15 +253,16 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        'BTC ',
+                        'BTC',
                         style: TextStyle(fontSize: 14),
                       ),
+                      const SizedBox(width: 4),
                       Text(
                         snapshots[0].data.totalAssetOfBtc.toString(),
-                        style: TextStyle(fontSize: 24),
+                        style: const TextStyle(fontSize: 24),
                       ),
-                      const SizedBox(width: 16),
-                      _calcWalletProfit(snapshots, 1),
+                      const SizedBox(width: 2),
+                      _WalletProfitWidget(snapshots: snapshots)
                     ],
                   ),
                   AnimatedContainer(
@@ -351,25 +327,15 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                     style: TextStyle(
                         fontSize: 18, color: colorScheme.inverseSurface),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'BTC',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      const Text(
-                        'Loading...',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '(+ 0.012)',
-                        style: '(+ 0.012)'.contains('+')
-                            ? const TextStyle(fontSize: 14, color: Colors.green)
-                            : const TextStyle(fontSize: 14, color: Colors.red),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(30)),
+                      height: 18,
+                      width: double.maxFinite,
+                    ),
                   ),
                 ],
               ),
@@ -378,6 +344,86 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
         );
       }
     });
+  }
+}
+
+class _WalletProfitWidget extends StatefulWidget {
+  _WalletProfitWidget({Key? key, required this.snapshots}) : super(key: key);
+  final List snapshots;
+  int period = 1;
+
+  @override
+  State<_WalletProfitWidget> createState() => __WalletProfitWidgetState();
+}
+
+class __WalletProfitWidgetState extends State<_WalletProfitWidget> {
+  Text _calcWalletProfit(List snapshots, int period) {
+    double diff = (snapshots[0].data.totalAssetOfBtc -
+        snapshots[period].data.totalAssetOfBtc);
+
+    // print(
+    //     'a: ${snapshots[0].data.totalAssetOfBtc}, b: ${snapshots[period].data.totalAssetOfBtc}, diff: $diff');
+
+    // diff = roundDouble(diff, 8);
+
+    if (diff > 0) {
+      return Text('(+${diff.toStringAsFixed(8)})',
+          style: const TextStyle(fontSize: 14, color: Colors.green));
+    } else if (diff < 0) {
+      return Text(
+        '(${diff.toStringAsFixed(8)})',
+        style: const TextStyle(fontSize: 14, color: Colors.red),
+      );
+    } else {
+      return Text(
+        '(${diff.toString()})',
+        style: const TextStyle(fontSize: 14),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _colorScheme = Theme.of(context).colorScheme;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+              onTap: () {
+                if (widget.period == 1) {
+                  widget.period = 6;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: _colorScheme.tertiaryContainer,
+                    elevation: 20,
+                    duration: const Duration(seconds: 1),
+                    content: Text(
+                      "Profit for last week",
+                      style: TextStyle(color: _colorScheme.inverseSurface),
+                    ),
+                  ));
+                } else {
+                  widget.period = 1;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: _colorScheme.tertiaryContainer,
+                    elevation: 20,
+                    duration: const Duration(seconds: 1),
+                    content: Text(
+                      "Profit for last 24 hours",
+                      style: TextStyle(color: _colorScheme.inverseSurface),
+                    ),
+                  ));
+                }
+
+                setState(() {});
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: _calcWalletProfit(widget.snapshots, widget.period),
+              ))),
+    );
   }
 }
 
