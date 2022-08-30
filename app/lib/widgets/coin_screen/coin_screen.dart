@@ -1,8 +1,6 @@
 import 'package:binance_spot/binance_spot.dart';
 import 'package:flutter/material.dart';
 
-import '../home_screen/models.dart';
-
 class CoinScreenWidget extends StatefulWidget {
   const CoinScreenWidget({Key? key, required this.data}) : super(key: key);
   final Balance data;
@@ -42,8 +40,8 @@ class _CoinScreenState extends State<CoinScreenWidget> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Flexible(flex: 2, child: Placeholder()),
+                      children: const [
+                        Flexible(flex: 2, child: Placeholder()),
                       ],
                     ),
                   ),

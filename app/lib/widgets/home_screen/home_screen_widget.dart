@@ -3,20 +3,16 @@
 import 'dart:developer';
 
 import 'package:binance_spot/binance_spot.dart';
-import 'package:coin_crawler_app/blocs/app_settings_bloc/app_settings_bloc.dart';
 import 'package:coin_crawler_app/blocs/binance_api_bloc/binance_api_bloc.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../settings_screen/settings_provider.dart';
-
 class HomeScreenWidget extends StatefulWidget {
-  HomeScreenWidget({Key? key}) : super(key: key);
+  const HomeScreenWidget({Key? key}) : super(key: key);
 
   @override
   State<HomeScreenWidget> createState() => _HomeScreenWidgetState();
@@ -35,7 +31,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme _colorScheme = Theme.of(context).colorScheme;
     return RefreshIndicator(
       onRefresh: () async {
         final bAPIBloc = context.read<BinanceAPIBloc>();
@@ -274,7 +269,7 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                     curve: Curves.fastOutSlowIn,
                     duration: const Duration(seconds: 1),
                     height: widget.isOpen ? 200 : 0,
-                    child: Placeholder(),
+                    child: const Placeholder(),
                   )
                 ],
               ),
@@ -393,7 +388,7 @@ class __WalletProfitWidgetState extends State<_WalletProfitWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final _colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: Material(
@@ -404,24 +399,24 @@ class __WalletProfitWidgetState extends State<_WalletProfitWidget> {
                   widget.period = 6;
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: _colorScheme.tertiaryContainer,
+                    backgroundColor: colorScheme.tertiaryContainer,
                     elevation: 20,
                     duration: const Duration(seconds: 1),
                     content: Text(
                       "Profit for last week",
-                      style: TextStyle(color: _colorScheme.inverseSurface),
+                      style: TextStyle(color: colorScheme.inverseSurface),
                     ),
                   ));
                 } else {
                   widget.period = 1;
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: _colorScheme.tertiaryContainer,
+                    backgroundColor: colorScheme.tertiaryContainer,
                     elevation: 20,
                     duration: const Duration(seconds: 1),
                     content: Text(
                       "Profit for last 24 hours",
-                      style: TextStyle(color: _colorScheme.inverseSurface),
+                      style: TextStyle(color: colorScheme.inverseSurface),
                     ),
                   ));
                 }
@@ -432,20 +427,6 @@ class __WalletProfitWidgetState extends State<_WalletProfitWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 child: _calcWalletProfit(widget.snapshots, widget.period),
               ))),
-    );
-  }
-}
-
-class _CoinBalancePreview extends StatelessWidget {
-  const _CoinBalancePreview({Key? key, required this.b}) : super(key: key);
-  final Balance b;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: [Text(b.asset), Text(b.free.toString())],
-      ),
     );
   }
 }
@@ -515,8 +496,6 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
             ],
           );
         } else {
-          int listLength = 2;
-          int currentPageIncremented = _currentPage + 1;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -107,7 +107,7 @@ class _NavigationDestinationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var tabsWidgets = <Widget>[
-      HomeScreenWidget(),
+      const HomeScreenWidget(),
       const CoinsScreenWidget(),
       const WalletScreenWidget(),
     ];

@@ -6,7 +6,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/app_settings_bloc/app_settings_bloc.dart';
-import 'widgets/settings_screen/settings_provider.dart';
 
 void main() {
   final AppSettingsBloc settingsBloc = AppSettingsBloc();
@@ -17,7 +16,7 @@ void main() {
 }
 
 class MainWidget extends StatefulWidget {
-  MainWidget({
+  const MainWidget({
     Key? key,
     required this.settingsBloc,
   }) : super(key: key);
@@ -39,9 +38,9 @@ class _MainWidgetState extends State<MainWidget> {
           child: BlocBuilder<AppSettingsBloc, AppSettingsState>(
             bloc: widget.settingsBloc,
             builder: (context, state) {
-              print('State: ${widget.settingsBloc.state}');
+              // print('State: ${widget.settingsBloc.state}');
               if (state is AppSettingsChangedState) {
-                print('ThemeMode: ${state.appSettings.appThemeMode}');
+                // print('ThemeMode: ${state.appSettings.appThemeMode}');
                 final BinanceAPIBloc binanceAPIBloc = BinanceAPIBloc();
                 return BlocProvider(
                   create: (context) => binanceAPIBloc,
@@ -55,7 +54,8 @@ class _MainWidgetState extends State<MainWidget> {
                     darkTheme: ThemeData(
                       colorScheme: darkDynamic,
                       brightness: Brightness.dark,
-                      scaffoldBackgroundColor: Color.fromRGBO(14, 14, 14, 1),
+                      scaffoldBackgroundColor:
+                          const Color.fromRGBO(14, 14, 14, 1),
                       useMaterial3: true,
                     ),
                     themeMode: state.appSettings.appThemeMode == 'Light'
@@ -70,7 +70,7 @@ class _MainWidgetState extends State<MainWidget> {
                   ),
                 );
               } else if (state is AppSettingsLoadededState) {
-                print('ThemeMode: ${state.appSettings.appThemeMode}');
+                // print('ThemeMode: ${state.appSettings.appThemeMode}');
                 final BinanceAPIBloc binanceAPIBloc = BinanceAPIBloc();
                 return BlocProvider(
                   create: (context) => binanceAPIBloc,
@@ -84,7 +84,8 @@ class _MainWidgetState extends State<MainWidget> {
                     darkTheme: ThemeData(
                       colorScheme: darkDynamic,
                       brightness: Brightness.dark,
-                      scaffoldBackgroundColor: Color.fromRGBO(14, 14, 14, 1),
+                      scaffoldBackgroundColor:
+                          const Color.fromRGBO(14, 14, 14, 1),
                       useMaterial3: true,
                     ),
                     themeMode: state.appSettings.appThemeMode == 'Light'
@@ -102,21 +103,20 @@ class _MainWidgetState extends State<MainWidget> {
                 return MaterialApp(
                     title: 'Coin Crawler',
                     theme: ThemeData(
-                      colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
+                      colorSchemeSeed: const Color.fromARGB(255, 101, 81, 214),
                       brightness: Brightness.light,
                       useMaterial3: true,
                     ),
                     darkTheme: ThemeData(
-                      colorSchemeSeed: Color.fromARGB(255, 101, 81, 214),
+                      colorSchemeSeed: const Color.fromARGB(255, 101, 81, 214),
                       brightness: Brightness.dark,
-                      scaffoldBackgroundColor: Color.fromRGBO(14, 14, 14, 1),
+                      scaffoldBackgroundColor:
+                          const Color.fromRGBO(14, 14, 14, 1),
                       useMaterial3: true,
                     ),
                     themeMode: ThemeMode.light,
                     debugShowCheckedModeBanner: false,
-                    home: Container(
-                      child: Center(child: CircularProgressIndicator()),
-                    ));
+                    home: const Center(child: CircularProgressIndicator()));
               }
             },
           ));
