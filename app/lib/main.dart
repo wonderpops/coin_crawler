@@ -1,11 +1,11 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:coin_crawler_app/blocs/binance_api_bloc/binance_api_bloc.dart';
 import 'package:coin_crawler_app/main_layout_widget.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/app_settings_bloc/app_settings_bloc.dart';
+import 'blocs/home_screen_data_loader_bloc/home_screen_data_loader_bloc.dart';
 
 void main() {
   final AppSettingsBloc settingsBloc = AppSettingsBloc();
@@ -41,7 +41,8 @@ class _MainWidgetState extends State<MainWidget> {
               // print('State: ${widget.settingsBloc.state}');
               if (state is AppSettingsChangedState) {
                 // print('ThemeMode: ${state.appSettings.appThemeMode}');
-                final BinanceAPIBloc binanceAPIBloc = BinanceAPIBloc();
+                final HomeScreenDataLoaderBloc binanceAPIBloc =
+                    HomeScreenDataLoaderBloc();
                 return BlocProvider(
                   create: (context) => binanceAPIBloc,
                   child: MaterialApp(
@@ -71,7 +72,8 @@ class _MainWidgetState extends State<MainWidget> {
                 );
               } else if (state is AppSettingsLoadededState) {
                 // print('ThemeMode: ${state.appSettings.appThemeMode}');
-                final BinanceAPIBloc binanceAPIBloc = BinanceAPIBloc();
+                final HomeScreenDataLoaderBloc binanceAPIBloc =
+                    HomeScreenDataLoaderBloc();
                 return BlocProvider(
                   create: (context) => binanceAPIBloc,
                   child: MaterialApp(

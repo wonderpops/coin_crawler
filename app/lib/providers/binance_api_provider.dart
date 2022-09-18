@@ -1,10 +1,13 @@
+import 'dart:developer';
+
 import 'package:binance_spot/binance_spot.dart';
+import 'package:either_dart/either.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_provider.dart';
 
 class BinanceAPIProvider {
   final _settingsProvider = SettingsProvider();
 
-  Future<BinanceSpot> getBinanceAPISwagger() async {
+  Future<BinanceSpot> _getBinanceAPISpot() async {
     String accessKey = await _settingsProvider.binanceAPIKey;
     String secretKey = await _settingsProvider.binanceAPISecret;
     return BinanceSpot(
@@ -13,21 +16,36 @@ class BinanceAPIProvider {
     );
   }
 
-  Future<Map<String, dynamic>> loadWalletPreviewData() async {
-    BinanceSpot binanceSpot = await getBinanceAPISwagger();
+  Future<Snapshots> getWalletPreviewData() async {
+    BinanceSpot binanceSpot = await _getBinanceAPISpot();
     final walletData =
         await binanceSpot.dailyAccountSnapshot(type: 'SPOT', recvWindow: 60000);
 
-    // final walletData.left =
-    if (walletData.isLeft) {
-      print(walletData.left);
+    if (walletData.isRight) {
+      return (walletData.right);
+    } else {
+      throw Exception('Error loading wallet data');
     }
-    return {
-      'walletData': walletData.isRight ? walletData.right : walletData.left,
-    };
+  }
 
-    // return {
-    //   'walletData': binanceSpot,
-    // };
+  Future<List<Kline>> getCoinCandleData(String coin) async {
+    BinanceSpot binanceSpot = await _getBinanceAPISpot();
+    String coinPair;
+    if (coin == 'BUSD') {
+      coinPair = 'BUSDUSDT';
+    } else {
+      coinPair = '${coin}BUSD';
+    }
+
+    final coinData = await binanceSpot.candlestickData(
+        symbol: coinPair, interval: Interval.INTERVAL_1d);
+
+    inspect(coinData);
+
+    if (coinData.isRight) {
+      return (coinData.right);
+    } else {
+      throw Exception('Error loading coin data');
+    }
   }
 }
