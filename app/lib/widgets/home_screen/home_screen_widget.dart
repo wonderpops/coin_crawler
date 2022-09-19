@@ -3,6 +3,7 @@
 import 'dart:developer';
 
 import 'package:binance_spot/binance_spot.dart';
+import 'package:coin_crawler_app/providers/binance_api_provider.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
@@ -65,7 +66,7 @@ class _TopScreenGreetingWidget extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     final String helloText;
     final int thisHour = DateTime.now().hour;
-    print(thisHour);
+
     if ((thisHour >= 0) && (thisHour < 6)) {
       helloText = 'Nighty night,';
     } else if ((thisHour >= 6) && (thisHour < 12)) {
@@ -136,7 +137,11 @@ class _TopScreenGreetingWidget extends StatelessWidget {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
+                        // print('lol');
+                        // final BinanceAPIProvider bap = BinanceAPIProvider();
+                        // final assets = await bap.getActionsHistory();
+
                         // showModalBottomSheet(
                         //     backgroundColor: Colors.transparent,
                         //     context: context,
@@ -301,7 +306,8 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              snapshots[0].data.totalAssetOfBtc.toString(),
+                              snapshots.last.data.totalAssetOfBtc
+                                  .toStringAsFixed(8),
                               style: const TextStyle(fontSize: 24),
                             ),
                           ],
@@ -805,7 +811,8 @@ class _LastActionsWidget extends StatefulWidget {
 class _LastActionsWidgetState extends State<_LastActionsWidget> {
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final BinanceAPIProvider _bap = BinanceAPIProvider();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(

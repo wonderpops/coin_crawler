@@ -20,17 +20,33 @@ class HomeScreenDataLoaderBloc
       Emitter<HomeScreenDataLoaderState> emit) async {
     emit(HomeScreenDataLoaderLoadingState());
     final SettingsProvider settingsProvider = SettingsProvider();
+    double totalAssetOfBtc = 0;
 
     final username = await settingsProvider.username;
+    final assets = await _bAPIProvider.getUserAssets();
     final walletData = await _bAPIProvider.getWalletPreviewData();
     final List<CoinPreviewData> coinsData = [];
 
-    for (var coin in walletData.snapshotVos[0].data.balances) {
+    for (var asset in assets) {
+      totalAssetOfBtc += double.parse(asset['btcValuation']);
+    }
+
+    walletData.snapshotVos.add(SnapshotVos.fromMap({
+      'data': {'balances': [], 'totalAssetOfBtc': totalAssetOfBtc.toString()},
+      'type': 'spot',
+      'updateTime': DateTime.now().microsecondsSinceEpoch
+    }));
+
+    for (var coin in assets) {
       try {
-        List<Kline> candles = await _bAPIProvider.getCoinCandleData(coin.asset);
+        List<Kline> candles =
+            await _bAPIProvider.getCoinCandleData(coin['asset']);
         coinsData.add(CoinPreviewData(
-            shortName: coin.asset, candles: candles, amount: coin.free));
+            shortName: coin['asset'],
+            candles: candles,
+            amount: double.parse(coin['free'])));
       } catch (e) {
+        print(e);
         // inspect(e);
       }
     }

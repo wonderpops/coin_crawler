@@ -41,7 +41,7 @@ class BinanceAPIProvider {
     final coinData = await binanceSpot.candlestickData(
         symbol: coinPair, interval: Interval.INTERVAL_15m, limit: 96);
 
-    inspect(coinData);
+    // inspect(coinData);
 
     if (coinData.isRight) {
       return (coinData.right);
@@ -49,4 +49,25 @@ class BinanceAPIProvider {
       throw Exception('Error loading coin data');
     }
   }
+
+  Future<List<dynamic>> getUserAssets() async {
+    BinanceSpot binanceSpot = await _getBinanceAPISpot();
+    final assets = await binanceSpot.sendRequest(
+        path: '/sapi/v3/asset/getUserAsset',
+        type: RequestType.POST,
+        keyRequired: true,
+        signatureRequired: true,
+        timestampRequired: true);
+    if (assets.isRight) {
+      return (assets.right);
+    } else {
+      throw Exception('Error loading assets data');
+    }
+  }
+
+  // Future getActionsHistory() async {
+  //   BinanceSpot binanceSpot = await _getBinanceAPISpot();
+  //   final history = await binanceSpot.accountTradeList(symbol: 'MATICBUSD');
+  //   inspect(history);
+  // }
 }
