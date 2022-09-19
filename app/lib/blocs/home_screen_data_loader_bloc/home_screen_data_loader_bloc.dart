@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:binance_spot/binance_spot.dart';
 import 'package:bloc/bloc.dart';
 import 'package:coin_crawler_app/providers/binance_api_provider.dart';
+import 'package:coin_crawler_app/widgets/settings_screen/settings_provider.dart';
 import 'package:meta/meta.dart';
 
 part 'home_screen_data_loader_event.dart';
@@ -18,7 +19,9 @@ class HomeScreenDataLoaderBloc
   onLoadWalletPreview(LoadHomeScreenDataEvent event,
       Emitter<HomeScreenDataLoaderState> emit) async {
     emit(HomeScreenDataLoaderLoadingState());
+    final SettingsProvider settingsProvider = SettingsProvider();
 
+    final username = await settingsProvider.username;
     final walletData = await _bAPIProvider.getWalletPreviewData();
     final List<CoinPreviewData> coinsData = [];
 
@@ -37,6 +40,7 @@ class HomeScreenDataLoaderBloc
     print('home screen data loaded');
 
     emit(HomeScreenDataLoaderLoadedState(
+        userData: UserData(username: username),
         walletPreviewData: WalletPreviewData(data: walletData),
         coinsPreviewData: coinsData));
 

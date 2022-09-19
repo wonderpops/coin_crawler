@@ -8,11 +8,14 @@ class HomeScreenDataLoaderInitial extends HomeScreenDataLoaderState {}
 class HomeScreenDataLoaderLoadingState extends HomeScreenDataLoaderState {}
 
 class HomeScreenDataLoaderLoadedState extends HomeScreenDataLoaderState {
+  final UserData userData;
   final WalletPreviewData walletPreviewData;
   final List<CoinPreviewData> coinsPreviewData;
 
   HomeScreenDataLoaderLoadedState(
-      {required this.walletPreviewData, required this.coinsPreviewData});
+      {required this.userData,
+      required this.walletPreviewData,
+      required this.coinsPreviewData});
 }
 
 class WalletPreviewData {
@@ -28,4 +31,9 @@ class CoinPreviewData {
 
   CoinPreviewData(
       {required this.shortName, required this.candles, required this.amount});
+}
+
+class UserData {
+  final String username;
+  UserData({required this.username});
 }

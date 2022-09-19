@@ -3,11 +3,9 @@
 import 'dart:developer';
 
 import 'package:binance_spot/binance_spot.dart';
-import 'package:coin_crawler_app/providers/binance_api_provider.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -65,6 +63,21 @@ class _TopScreenGreetingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
+    final String helloText;
+    final int thisHour = DateTime.now().hour;
+    print(thisHour);
+    if ((thisHour >= 0) && (thisHour < 6)) {
+      helloText = 'Nighty night,';
+    } else if ((thisHour >= 6) && (thisHour < 12)) {
+      helloText = 'Lovely morning,';
+    } else if ((thisHour >= 12) && (thisHour < 18)) {
+      helloText = 'Wonderful day,';
+    } else if ((thisHour >= 18) && (thisHour < 24)) {
+      helloText = 'Fine evening,';
+    } else {
+      helloText = 'Hey there,';
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -72,14 +85,36 @@ class _TopScreenGreetingWidget extends StatelessWidget {
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                'Good Evening,',
+                helloText,
                 style: TextStyle(fontSize: 24),
               ),
-              Text(
-                'Wonderpop',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              BlocBuilder<HomeScreenDataLoaderBloc, HomeScreenDataLoaderState>(
+                builder: (context, state) {
+                  if (state is HomeScreenDataLoaderLoadedState) {
+                    return Text(
+                      state.userData.username,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    );
+                  } else {
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(.2),
+                              borderRadius: BorderRadius.circular(30)),
+                          height: 18,
+                          width: 150,
+                        ),
+                      ),
+                    );
+                  }
+                },
               )
             ],
           ),

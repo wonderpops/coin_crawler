@@ -87,7 +87,7 @@ class _MainLayoutWidgetState extends State<MainLayoutWidget>
             selectedItemColor: colorScheme.brightness == Brightness.light
                 ? colorScheme.onBackground
                 : colorScheme.onBackground,
-            unselectedItemColor: colorScheme.secondary.withOpacity(.5),
+            unselectedItemColor: colorScheme.onBackground.withOpacity(.7),
             backgroundColor: colorScheme.inversePrimary,
           ),
         ),
