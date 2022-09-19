@@ -7,6 +7,7 @@ import 'package:coin_crawler_app/providers/binance_api_provider.dart';
 import 'package:coin_crawler_app/widgets/coin_screen/coin_screen.dart';
 import 'package:coin_crawler_app/widgets/home_screen/models.dart';
 import 'package:coin_crawler_app/widgets/settings_screen/settings_screen.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -42,16 +43,16 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
             ((element) => element is HomeScreenDataLoaderLoadedState));
       },
       child: ListView(
-        children: [
-          const SizedBox(height: 16),
-          const _TopScreenGreetingWidget(),
-          const SizedBox(height: 32),
+        children: const [
+          SizedBox(height: 16),
+          _TopScreenGreetingWidget(),
+          SizedBox(height: 32),
           _WalletPreviewWidget(),
-          const SizedBox(height: 32),
-          const _CoinsPreviewWidget(),
-          const SizedBox(height: 32),
-          const _LastActionsWidget(),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
+          _CoinsPreviewWidget(),
+          SizedBox(height: 32),
+          _LastActionsWidget(),
+          SizedBox(height: 32),
         ],
       ),
     );
@@ -177,7 +178,7 @@ class _TopScreenGreetingWidget extends StatelessWidget {
 }
 
 class _WalletPreviewWidget extends StatefulWidget {
-  _WalletPreviewWidget({Key? key}) : super(key: key);
+  const _WalletPreviewWidget({Key? key}) : super(key: key);
 
   @override
   State<_WalletPreviewWidget> createState() => _WalletPreviewWidgetState();
@@ -196,7 +197,7 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
     return BlocConsumer<HomeScreenDataLoaderBloc, HomeScreenDataLoaderState>(
         listener: (context, state) {
       if (state is HomeScreenDataLoaderLoadedState) {
-        inspect(state.walletPreviewData.data);
+        inspect(state);
       }
     }, builder: (context, state) {
       if (state is HomeScreenDataLoaderLoadedState) {
@@ -291,7 +292,7 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                                 plotAreaBorderColor: Colors.transparent,
                                 primaryXAxis: DateTimeAxis(isVisible: false),
                                 primaryYAxis: NumericAxis(isVisible: false),
-                                margin: const EdgeInsets.all(0.1),
+                                margin: const EdgeInsets.all(0.2),
                                 series: <
                                     SplineAreaSeries<SnapshotVos, DateTime>>[
                                   SplineAreaSeries<SnapshotVos, DateTime>(
@@ -299,14 +300,15 @@ class _WalletPreviewWidgetState extends State<_WalletPreviewWidget> {
                                       color:
                                           colorScheme.primary.withOpacity(.2),
                                       borderWidth: 4,
-                                      borderGradient:
-                                          LinearGradient(colors: <Color>[
-                                        colorScheme.tertiary.withOpacity(.4),
-                                        colorScheme.tertiary.withOpacity(.9)
-                                      ], stops: const <double>[
-                                        0.2,
-                                        0.9
-                                      ]),
+                                      borderGradient: LinearGradient(
+                                          colors: <Color>[
+                                            colorScheme.surfaceTint,
+                                            colorScheme.tertiary
+                                          ],
+                                          stops: const <double>[
+                                            0,
+                                            1
+                                          ]),
                                       dataSource: snapshots,
                                       xValueMapper: (SnapshotVos snap, _) =>
                                           DateTime.fromMicrosecondsSinceEpoch(
@@ -506,8 +508,8 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
     return BlocBuilder<HomeScreenDataLoaderBloc, HomeScreenDataLoaderState>(
       builder: (context, state) {
         if (state is HomeScreenDataLoaderLoadedState) {
-          final snapshot = state.walletPreviewData.data.snapshotVos[0];
-          int listLength = snapshot.data.balances.length;
+          final coinsData = state.coinsPreviewData;
+          int listLength = coinsData.length;
           int currentPageIncremented = _currentPage + 1;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -535,8 +537,7 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
                       setState(() {});
                     },
                     itemBuilder: (context, index) {
-                      return carouselView(
-                          context, index, snapshot.data.balances);
+                      return carouselView(context, index, coinsData);
                     }),
               ),
             ],
@@ -589,7 +590,7 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
     );
   }
 
-  Widget carouselView(context, int index, [List? coins]) {
+  Widget carouselView(context, int index, [List<CoinPreviewData>? coins]) {
     return AnimatedBuilder(
       animation: _carouselPageController,
       builder: (context, child) {
@@ -619,15 +620,11 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
           value = 0.75;
         }
         // print("value $value index $index");
-        return BlocBuilder<HomeScreenDataLoaderBloc, HomeScreenDataLoaderState>(
-          builder: (context, state) {
-            return Transform.scale(
-              scale: value.abs(),
-              child: coins == null
-                  ? notLoadedCarouselCard()
-                  : loadedCarouselCard(coins[index]),
-            );
-          },
+        return Transform.scale(
+          scale: value.abs(),
+          child: coins == null
+              ? notLoadedCarouselCard()
+              : loadedCarouselCard(coins[index]),
         );
       },
     );
@@ -650,92 +647,110 @@ class _CoinsPreviewWidgetState extends State<_CoinsPreviewWidget> {
     );
   }
 
-  Widget loadedCarouselCard(Balance data) {
+  Widget loadedCarouselCard(CoinPreviewData data) {
     final colorScheme = Theme.of(context).colorScheme;
-    final b_api_prov = BinanceAPIProvider();
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Hero(
-              tag: data.asset,
-              child: Material(
-                type: MaterialType.transparency,
-                child: InkWell(
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  CoinScreenWidget(data: data)));
-                    },
+    return Stack(
+      children: [
+        Column(
+          children: <Widget>[
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Hero(
+                  tag: data.shortName,
+                  child: Material(
+                    type: MaterialType.transparency,
                     child: Container(
                       width: double.maxFinite,
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              flex: 0,
-                              child: Text(data.asset,
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            flex: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(data.shortName,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                  Text(
+                                      'Amount: ${data.amount} ${data.shortName}',
+                                      style: const TextStyle(fontSize: 15)),
+                                  Text('Price: ${data.candles.last.close} \$',
+                                      style: const TextStyle(fontSize: 15)),
+                                  Text(
+                                      'Total: ${(data.candles.last.close * data.amount).toStringAsFixed(2)} \$',
+                                      style: const TextStyle(fontSize: 15)),
+                                ],
+                              ),
                             ),
-                            IconButton(
-                                onPressed: () async {
-                                  await b_api_prov
-                                      .getCoinCandleData(data.asset);
-                                },
-                                icon: Icon(Icons.disc_full)),
-                            // Flexible(
-                            //   flex: 2,
-                            //   child: SfCartesianChart(
-                            //       plotAreaBorderColor: Colors.transparent,
-                            //       primaryXAxis: DateTimeAxis(isVisible: false),
-                            //       primaryYAxis: NumericAxis(isVisible: false),
-                            //       margin: const EdgeInsets.all(0.1),
-                            //       series: <
-                            //           SplineAreaSeries<SnapshotVos, DateTime>>[
-                            //         SplineAreaSeries<SnapshotVos, DateTime>(
-                            //             splineType: SplineType.monotonic,
-                            //             color:
-                            //                 colorScheme.primary.withOpacity(.2),
-                            //             borderWidth: 4,
-                            //             borderGradient:
-                            //                 LinearGradient(colors: <Color>[
-                            //               colorScheme.tertiary.withOpacity(.4),
-                            //               colorScheme.tertiary.withOpacity(.9)
-                            //             ], stops: const <double>[
-                            //               0.2,
-                            //               0.9
-                            //             ]),
-                            //             dataSource: data,
-                            //             xValueMapper: (SnapshotVos snap, _) =>
-                            //                 DateTime.fromMicrosecondsSinceEpoch(
-                            //                     snap.updateTime),
-                            //             yValueMapper: (SnapshotVos snap, _) =>
-                            //                 snap.data.totalAssetOfBtc)
-                            //       ]),
-                            // ),
-                            Flexible(
-                              flex: 0,
-                              child: Text('Total: ${data.free} ${data.asset}',
-                                  style: const TextStyle(fontSize: 18)),
+                          ),
+                          Flexible(
+                            flex: 2,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: SfCartesianChart(
+                                  plotAreaBorderColor: Colors.transparent,
+                                  primaryXAxis: DateTimeAxis(isVisible: false),
+                                  primaryYAxis: NumericAxis(isVisible: false),
+                                  margin: const EdgeInsets.all(0.1),
+                                  series: <SplineAreaSeries<Kline, DateTime>>[
+                                    SplineAreaSeries<Kline, DateTime>(
+                                        splineType: SplineType.monotonic,
+                                        color:
+                                            colorScheme.primary.withOpacity(.2),
+                                        borderWidth: 4,
+                                        borderGradient: LinearGradient(
+                                            colors: <Color>[
+                                              colorScheme.surfaceTint,
+                                              colorScheme.tertiary
+                                            ],
+                                            stops: const <double>[
+                                              0,
+                                              1
+                                            ]),
+                                        dataSource: data.candles,
+                                        xValueMapper: (Kline candle, _) =>
+                                            DateTime.fromMicrosecondsSinceEpoch(
+                                                candle.closeTimestamp),
+                                        yValueMapper: (Kline snap, _) =>
+                                            snap.close)
+                                  ]),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+        Material(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CoinScreenWidget(data: data)));
+              },
+              splashColor: colorScheme.tertiary.withOpacity(.3),
+              hoverColor: colorScheme.tertiary.withOpacity(.3),
+              borderRadius: BorderRadius.circular(30),
+              child: Container(
+                alignment: Alignment.center,
               ),
             ),
           ),

@@ -22,17 +22,19 @@ class HomeScreenDataLoaderBloc
     final walletData = await _bAPIProvider.getWalletPreviewData();
     final List<CoinPreviewData> coinsData = [];
 
-    print('walletDat_loaded');
-
-    walletData.snapshotVos[0].data.balances.forEach((coin) async {
+    for (var coin in walletData.snapshotVos[0].data.balances) {
       try {
-        List candles = await _bAPIProvider.getCoinCandleData(coin.asset);
+        List<Kline> candles = await _bAPIProvider.getCoinCandleData(coin.asset);
         coinsData.add(CoinPreviewData(
             shortName: coin.asset, candles: candles, amount: coin.free));
       } catch (e) {
-        print(e);
+        // inspect(e);
       }
-    });
+    }
+
+    // inspect(coinsData);
+
+    print('home screen data loaded');
 
     emit(HomeScreenDataLoaderLoadedState(
         walletPreviewData: WalletPreviewData(data: walletData),

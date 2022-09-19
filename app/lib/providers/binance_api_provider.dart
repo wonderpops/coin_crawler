@@ -18,6 +18,7 @@ class BinanceAPIProvider {
 
   Future<Snapshots> getWalletPreviewData() async {
     BinanceSpot binanceSpot = await _getBinanceAPISpot();
+    // inspect(binanceSpot);
     final walletData =
         await binanceSpot.dailyAccountSnapshot(type: 'SPOT', recvWindow: 60000);
 
@@ -38,7 +39,7 @@ class BinanceAPIProvider {
     }
 
     final coinData = await binanceSpot.candlestickData(
-        symbol: coinPair, interval: Interval.INTERVAL_1d);
+        symbol: coinPair, interval: Interval.INTERVAL_15m, limit: 96);
 
     inspect(coinData);
 

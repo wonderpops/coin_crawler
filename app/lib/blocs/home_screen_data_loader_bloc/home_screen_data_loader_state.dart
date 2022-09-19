@@ -23,7 +23,7 @@ class WalletPreviewData {
 
 class CoinPreviewData {
   final String shortName;
-  final List candles;
+  final List<Kline> candles;
   final double amount;
 
   CoinPreviewData(
